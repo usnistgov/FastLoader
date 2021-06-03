@@ -96,7 +96,7 @@ template<class DataType>
   /// @param indexColGlobalTile Tile column index
   /// @param level Tile's level
   void loadTileFromFile(std::shared_ptr<std::vector<DataType>> tile,
-                        uint32_t indexRowGlobalTile, uint32_t indexColGlobalTile, uint32_t indexLayerGlobalTile,
+                        uint32_t indexRowGlobalTile, uint32_t indexColGlobalTile, [[maybe_unused]] uint32_t indexLayerGlobalTile,
                         [[maybe_unused]] uint32_t level) override {
     tdata_t tiffTile = nullptr;
     tiffTile = _TIFFmalloc(TIFFTileSize(tiff_));
