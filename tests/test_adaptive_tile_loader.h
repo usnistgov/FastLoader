@@ -27,18 +27,19 @@
 #include "tile_loaders/virtual_file_tile_loader.h"
 #include "tile_loaders/virtual_file_adaptive_tile_loader.h"
 
-std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> adaptiveFL(
+std::shared_ptr<fl::AdaptiveFastLoaderGraph<fl::DefaultView<int>>> adaptiveFL(
     uint32_t fileSize, uint32_t logicalSize, uint32_t physicalTile) {
-  auto tl = std::make_shared<VirtualFileAdaptiveTileLoader>(
+
+  auto tl = std::make_shared<VirtualFileTileLoader>(
       1,
       fileSize, fileSize, fileSize,
-      std::vector<uint32_t>{logicalSize}, std::vector<uint32_t>{logicalSize}, std::vector<uint32_t>{logicalSize},
-      std::vector<uint32_t>{5},
       physicalTile, physicalTile, physicalTile);
   auto options = std::make_unique<fl::FastLoaderConfiguration<fl::DefaultView<int>>>(tl);
   options->radius(2);
   options->ordered(true);
-  return std::make_shared<fl::FastLoaderGraph<fl::DefaultView<int>>>(std::move(options));
+  return std::make_shared<fl::AdaptiveFastLoaderGraph<fl::DefaultView<int>>>(
+      std::move(options),
+      std::vector<uint32_t>(1, logicalSize), std::vector<uint32_t>(1, logicalSize), std::vector<uint32_t>(1, logicalSize));
 }
 
 std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> basicFL(uint32_t fileSize, uint32_t physicalTile) {

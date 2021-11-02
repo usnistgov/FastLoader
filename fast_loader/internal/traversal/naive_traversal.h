@@ -30,27 +30,23 @@ namespace internal {
 
 /// @brief Naive traversal pattern, traverse the file in increasing, layers, rows, columns
 /// @tparam ViewType Type of view
-template<class ViewType>
-class NaiveTraversal : public AbstractTraversal<ViewType> {
+class NaiveTraversal : public AbstractTraversal {
  public:
+  NaiveTraversal() : AbstractTraversal("Naive Traversal"){};
 
-  /// @brief Create a NaiveTraversal from a tile loader
-  /// @param tl Tile loader used to get information from the file
-  explicit NaiveTraversal(std::shared_ptr<AbstractTileLoader<ViewType>> tl)
-      : AbstractTraversal<ViewType>("Naive", tl) {}
-
-      /// @brief Default destructor
-  virtual ~NaiveTraversal() = default;
+  /// @brief Default destructor
+  ~NaiveTraversal() override = default;
 
   /// @brief Traversal accessor
   /// @param level Pyramid level requested
   /// @return Vector of (row, column, layer) representing the traversal
-  [[nodiscard]] std::vector<std::array<uint32_t, 3>> traversal(uint32_t level) const final{
+  [[nodiscard]] std::vector<std::array<uint32_t, 3>> traversal(
+      uint32_t numberTileHeight, uint32_t numberTileWidth, uint32_t numberTileDepth) const final{
     std::vector<std::array<uint32_t, 3>> traversal {};
-    traversal.reserve(this->numberTileDepth(level) * this->numberTileHeight(level) * this->numberTileWidth(level));
-    for (uint32_t layer = 0; layer < this->numberTileDepth(level); ++layer) {
-      for (uint32_t row = 0; row < this->numberTileHeight(level); ++row) {
-        for (uint32_t col = 0; col < this->numberTileWidth(level); ++col) {
+    traversal.reserve(numberTileDepth * numberTileHeight * numberTileWidth);
+    for (uint32_t layer = 0; layer < numberTileDepth; ++layer) {
+      for (uint32_t row = 0; row < numberTileHeight; ++row) {
+        for (uint32_t col = 0; col < numberTileWidth; ++col) {
           traversal.push_back(std::array<uint32_t, 3>{row, col, layer});
         }
       }

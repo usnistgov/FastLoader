@@ -22,6 +22,7 @@
 #ifdef HH_USE_CUDA
 #include "api/unified_view.h"
 #endif //HH_USE_CUDA
+#include "api/adaptive_fast_loader_graph.h"
 #include "api/fast_loader_graph.h"
 #include "api/fast_loader_configuration.h"
 #include "api/abstract_adaptive_tile_loader.h"

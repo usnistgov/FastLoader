@@ -62,12 +62,19 @@ class CachedTile {
   /// \param tileHeight Tile height
   /// \param tileDepth Tile depth
   /// \param numberChannel Number of pixel channels
-  explicit CachedTile(uint32_t tileWidth, uint32_t tileHeight, uint32_t tileDepth, uint32_t numberChannel) :
-      data_(
-          std::make_shared<std::vector<DataType>>(tileWidth * tileHeight * tileDepth * numberChannel, DataType())),
+  explicit CachedTile(size_t tileWidth, size_t tileHeight, size_t tileDepth, size_t numberChannel) :
       indexRow_(0), indexCol_(0), indexLayer_(0),
       newTile_(true),
-      tileWidth_(tileWidth), tileHeight_(tileHeight), tileDepth_(tileDepth), numberChannels_(numberChannel) {}
+      tileWidth_(tileWidth), tileHeight_(tileHeight), tileDepth_(tileDepth), numberChannels_(numberChannel) {
+        try{
+          data_ = std::make_shared<std::vector<DataType>>(tileWidth * tileHeight * tileDepth * numberChannel);
+        }catch (std::bad_alloc const & except){
+          std::ostringstream oss;
+          oss << "Problem while allocating a cacge tile with the dimension (" << ": " << tileWidth << "x" << tileHeight << "x" << tileDepth << "x" << numberChannel << ") :";
+          oss << except.what();
+          throw std::runtime_error(oss.str());
+        }
+      }
 
   /// \brief CachedTile Destructor
   virtual ~CachedTile() = default;

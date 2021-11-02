@@ -65,6 +65,9 @@ class TileRequest {
       : indexRowTileAsked_(indexRowTileAsked), indexColTileAsked_(indexColTileAsked),
       indexLayerTileAsked_(indexLayerTileAsked), view_(view) {}
 
+  /// @brief Default destructor
+  virtual ~TileRequest() = default;
+
   /// @brief Row index tile accessor
   /// @return Row index tile
   [[nodiscard]] uint32_t const &indexRowTileAsked() const { return indexRowTileAsked_; }

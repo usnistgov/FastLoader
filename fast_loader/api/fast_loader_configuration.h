@@ -71,6 +71,7 @@ class FastLoaderGraph;
 template<class ViewType>
 class FastLoaderConfiguration {
   friend FastLoaderGraph<ViewType>; ///< Define FastLoaderGraph<ViewType> as friend
+  friend AdaptiveFastLoaderGraph<ViewType>; ///< Define FastLoaderGraph<ViewType> as friend
   static_assert(std::is_default_constructible_v<ViewType>,
                 "The given type should be default constructible.");
   static_assert(internal::traits::HasDataType<ViewType>::value,
@@ -99,7 +100,7 @@ class FastLoaderConfiguration {
   TraversalType
       traversalType_; ///< Traversal type used when all views are requested
 
-  std::shared_ptr<AbstractTraversal<ViewType>>
+  std::shared_ptr<AbstractTraversal>
       traversal_; ///< Traversal instance used when all views are requested
 
   bool
@@ -107,15 +108,15 @@ class FastLoaderConfiguration {
 
   uint32_t
       levels_, ///< File level (pyramidal, etc.)
-      radiusHeight_, ///< AbstractView's height radius
-      radiusWidth_, ///< AbstractView's width radius
-      radiusDepth_; ///< AbstractView's depth radius
+  radiusHeight_, ///< AbstractView's height radius
+  radiusWidth_, ///< AbstractView's width radius
+  radiusDepth_; ///< AbstractView's depth radius
 
  public:
   /// @brief FastLoaderConfiguration constructor using a AbstractTileLoader
   /// @param tileLoader AbstractTileLoader that will be used by FastImageGraph
-  explicit FastLoaderConfiguration(std::shared_ptr<AbstractTileLoader<ViewType>> const &tileLoader) : tileLoader_(
-      tileLoader) {
+  explicit FastLoaderConfiguration(std::shared_ptr<AbstractTileLoader<ViewType>> const &tileLoader)
+  : tileLoader_(tileLoader) {
     // Test the validity of the tileLoader
     validateTileLoader();
     nbReleasePyramid_ = std::vector<uint32_t>(tileLoader->numberPyramidLevels(), 1);
@@ -125,7 +126,7 @@ class FastLoaderConfiguration {
     borderCreator_ =
         std::make_shared<internal::ConstantBorderCreator<ViewType>>(typename ViewType::data_t());
     traversalType_ = TraversalType::NAIVE;
-    traversal_ = std::make_shared<internal::NaiveTraversal<ViewType>>(tileLoader_);
+    traversal_ = std::make_shared<internal::NaiveTraversal>();
     ordered_ = false;
     levels_ = tileLoader->numberPyramidLevels();
     radiusHeight_ = 0;
@@ -152,20 +153,20 @@ class FastLoaderConfiguration {
   void traversalType(TraversalType traversalType) {
     std::ostringstream oss;
     switch (traversalType) {
-      case TraversalType::NAIVE:traversal_ = std::make_shared<internal::NaiveTraversal<ViewType>>(tileLoader_);
+      case TraversalType::NAIVE:traversal_ = std::make_shared<internal::NaiveTraversal>();
         break;
-        // TODO: Add additional traversals for 3D
-//      case TraversalType::SNAKE:traversal_ = std::make_shared<internal::SnakeTraversal<ViewType>>(tileLoader_);
-//        break;
-//      case TraversalType::DIAGONAL:traversal_ = std::make_shared<internal::DiagonalTraversal<ViewType>>(tileLoader_);
-//        break;
-//      case TraversalType::HILBERT:traversal_ = std::make_shared<internal::HilbertTraversal<ViewType>>(tileLoader_);
-//        break;
-//      case TraversalType::SPIRAL:traversal_ = std::make_shared<internal::SpiralTraversal<ViewType>>(tileLoader_);
-//        break;
-//      case TraversalType::RECURSIVE_BLOCK:
-//        traversal_ = std::make_shared<internal::BlockRecursiveTraversal<ViewType>>(tileLoader_);
-//        break;
+//        // TODO: Add additional traversals for 3D
+////      case TraversalType::SNAKE:traversal_ = std::make_shared<internal::SnakeTraversal<ViewType>>(tileLoader_);
+////        break;
+////      case TraversalType::DIAGONAL:traversal_ = std::make_shared<internal::DiagonalTraversal<ViewType>>(tileLoader_);
+////        break;
+////      case TraversalType::HILBERT:traversal_ = std::make_shared<internal::HilbertTraversal<ViewType>>(tileLoader_);
+////        break;
+////      case TraversalType::SPIRAL:traversal_ = std::make_shared<internal::SpiralTraversal<ViewType>>(tileLoader_);
+////        break;
+////      case TraversalType::RECURSIVE_BLOCK:
+////        traversal_ = std::make_shared<internal::BlockRecursiveTraversal<ViewType>>(tileLoader_);
+////        break;
       case TraversalType::CUSTOM:
         oss
             << "This filling strategy need a custom implementation of AbstractTraversal, please call "
@@ -173,16 +174,15 @@ class FastLoaderConfiguration {
         throw (std::runtime_error(oss.str()));
     }
     traversalType_ = traversalType;
-
   }
 
-/// @brief Setter to custom traversal
+  /// @brief Setter to custom traversal
 /// @tparam Traversal Traversal type to use
 /// @param traversal Traversal to use
-  template<class Traversal, class = std::enable_if<std::is_base_of_v<AbstractTraversal<ViewType>, Traversal>>>
+  template<class Traversal, class = std::enable_if<std::is_base_of_v<AbstractTraversal, Traversal>>>
   void traversalCustom(std::shared_ptr<Traversal> traversal) {
     traversalType_ = TraversalType::CUSTOM;
-    traversal_ = std::static_pointer_cast<AbstractTraversal<ViewType>>(traversal);
+    traversal_ = std::static_pointer_cast<AbstractTraversal>(traversal);
   }
 
   /// @brief Define if the view are returned in the same order they have been requested

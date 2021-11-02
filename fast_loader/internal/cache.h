@@ -185,32 +185,35 @@ class Cache {
   /// @param cache FastLoader cache to print
   /// @return Output stream
   friend std::ostream &operator<<(std::ostream &os, const Cache &cache) {
+    uint32_t numLayer = 0;
     os << "-------------------------------------------" << std::endl;
     os << "Cache AbstractView:" << std::endl;
     os << "Waiting Queue: " << std::endl;
-    print_queue(cache._pool);
+    print_queue(cache.pool_);
     os << "MapCache: " << std::endl;
-    for (auto row = cache._mapCache.begin(); row != cache._mapCache.end();
-         ++row) {
-      for (auto col = row->begin(); col != row->end(); ++col) {
-        os << *col << " ";
+    for (auto layer = cache.mapCache_.begin(); layer != cache.mapCache_.end(); ++layer) {
+      os << "Layer #" << numLayer++ << std::endl;
+      for (auto row = layer->begin(); row != layer->end(); ++row) {
+        for (auto col = row->begin(); col != row->end(); ++col) {
+          os << *col << " ";
+        }
+        os << std::endl;
       }
       os << std::endl;
     }
     os << "MapLRU: " << std::endl;
-    for (auto elem : cache._mapLRU)
+    for (auto elem : cache.mapLRU_)
       os << "    " << elem.first << ": "
-         << std::distance(cache._lru.begin(), elem.second) << std::endl;
+         << std::distance(cache.lru_.begin(), elem.second) << std::endl;
 
     os << "ListLRU: " << std::endl;
-    for (auto elem : cache._lru)
+    for (auto elem : cache.lru_)
       os << elem << " ";
     os << std::endl;
-    os << "timeGet: " << cache._timeGet << " / "
-       << "timeRelease: " << cache._timeRecycle << " / "
-       << "timeDisk: " << cache._timeDisk << " / "
-       << "nbTilesCache: " << cache._nbTilesCache << " / miss: " << cache._miss
-       << " / hit: " << cache._hit;
+    os << "timeGet: " << cache.accessTime_ << " / "
+       << "timeRelease: " << cache.recycleTime_ << " / "
+       << "nbTilesCache: " << cache.nbTilesCache_ << " / miss: " << cache.miss_
+       << " / hit: " << cache.hit_;
     os << std::endl << "-------------------------------------------"
        << std::endl;
     return os;
@@ -241,7 +244,16 @@ class Cache {
 
     // Get LRU Tile
     toRecycle = lru_.back();
+    
+//    global_mutex.lock();
+//    std::cout << this << " Wait for tile to release: (" << toRecycle->indexRow() << ", " << toRecycle->indexCol() << ", " << toRecycle->indexLayer() << ")" << std::endl;
+//    global_mutex.unlock();
+    
     toRecycle->lock();
+    
+//    global_mutex.lock();
+//    std::cout << this << " Tile: (" << toRecycle->indexRow() << ", " << toRecycle->indexCol() << ", " << toRecycle->indexLayer() << ") released !" << std::endl;
+//    global_mutex.unlock();
     lru_.pop_back();
 
     // Clean The Tile

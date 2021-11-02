@@ -35,6 +35,9 @@ namespace fl {
 /// @tparam ViewType AbstractView Type
 template<class ViewType>
 class FastLoaderGraph;
+
+template<class ViewType>
+class AdaptiveFastLoaderGraph;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 /// @brief TileLoader interface
@@ -55,9 +58,10 @@ class FastLoaderGraph;
 template<class ViewType>
 class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewType>, internal::TileRequest<ViewType>> {
   friend FastLoaderGraph<ViewType>; ///< Define FastLoaderGraph<ViewType> as friend
+  friend AdaptiveFastLoaderGraph<ViewType>; ///< Define FastLoaderGraph<ViewType> as friend
   using DataType = typename ViewType::data_t; ///< Sample type (AbstractView element type)
  private:
-  std::vector<std::shared_ptr<internal::Cache<DataType>>>
+  std::shared_ptr<std::vector<std::shared_ptr<internal::Cache<DataType>>>>
       allCaches_ = {}; ///< All caches for each pyramid levels
 
   std::shared_ptr<internal::Cache<DataType>>
@@ -93,7 +97,9 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
   /// @brief Initialize the AbstractTileLoader (set as final, if an initialization step is needed,
   /// initializeTileLoader should be used).
   /// @details  Set the cache for the correct pyramid level from allCaches_
-  void initialize() final { cache_ = allCaches_[this->graphId()]; initializeTileLoader(); }
+  void initialize() final {
+    cache_ = allCaches_->at(this->graphId()); initializeTileLoader();
+  }
 
   /// @brief Specializable method used to initialise a Tile Loader
   virtual void initializeTileLoader () {};

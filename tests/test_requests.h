@@ -54,6 +54,7 @@ void testOrdering(){
   uint32_t
       fileSize = 5,
       physicalTile = 1;
+
   auto tl = std::make_shared<VirtualFileTileLoader>(
       1,
       fileSize, fileSize, fileSize,
@@ -64,9 +65,9 @@ void testOrdering(){
 
   auto fl = fl::FastLoaderGraph<fl::DefaultView<int>>(std::move(options));
 
-  fl::internal::NaiveTraversal<fl::DefaultView<int>> traversal(std::static_pointer_cast<fl::AbstractTileLoader<fl::DefaultView<int>>>(tl));
+  fl::internal::NaiveTraversal traversal{};
 
-  auto truth = traversal.traversal(0);
+  auto truth = traversal.traversal(5, 5, 5);
   size_t numberReceived = 0;
 
   fl.executeGraph();

@@ -177,7 +177,7 @@ if (BUILD_MAIN)
 			fast_loader/internal/traversal/hilbert_traversal.h
 			fast_loader/internal/traversal/diagonal_traversal.h
 			fast_loader/internal/traversal/block_recursive_traversal.h
-			)
+			fast_loader/api/adaptive_fast_loader_graph.h fast_loader/internal/graph/tasks/mapper_logical_physical.h fast_loader/internal/data/adaptive_tile_request.h fast_loader/internal/data/view/adaptive_view.h fast_loader/internal/data/view_data/adaptive_view_data.h fast_loader/internal/graph/states/direct_to_copy_state.h fast_loader/internal/graph/tasks/copy_logical_tile_to_view.h fast_loader/internal/graph/states/to_tile_loader_state.h fast_loader/internal/graph/states/tile_loader_counter_state.h)
 
 	if(TIFF_FOUND)
 		set(FL_SRC

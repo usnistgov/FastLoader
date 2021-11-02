@@ -327,7 +327,7 @@ class AbstractView {
   /// @brief Internal representation setter [Should not be used by end user]
   /// @attention Should not be used by end user.
   /// @param viewData Internal representation to set
-  virtual void viewData(std::shared_ptr<internal::AbstractViewData<DataType>> const viewData) = 0;
+  virtual void viewData(std::shared_ptr<internal::AbstractViewData<DataType>> viewData) = 0;
 
   /// @brief Extract and do a deepcopy of an internal view to a new contiguous piece of memory
   /// @param sharedRadius Radius of the extracted view centered in the central tile

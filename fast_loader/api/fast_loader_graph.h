@@ -81,7 +81,7 @@ namespace fl {
 /// @tparam ViewType Type of the view.
 template<class ViewType>
 class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
- private:
+ protected:
   std::unique_ptr<FastLoaderConfiguration<ViewType>>
       configurations_ = {}; ///< FastLoaderGraph configurations
 
@@ -94,6 +94,21 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
   bool
       finishRequestingTiles_ = false; ///< Flag to indicate tiles will not be requested anymore
 
+  uint32_t
+      numberChannels_{},
+      numberPyramidLevels_{};
+
+  std::shared_ptr<std::vector<uint32_t>>
+      fullHeightPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      fullWidthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      fullDepthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      tileHeightPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      tileWidthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      tileDepthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      viewHeightPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      viewWidthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
+      viewDepthPerLevel_ = std::make_shared<std::vector<uint32_t>>();
+
  public:
   /// @brief Main FastLoaderGraph constructor
   /// @param configuration FastLoaderGraph configuration. Need to be moved, and can not be modified after being set.
@@ -102,36 +117,53 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
   explicit FastLoaderGraph(std::unique_ptr<FastLoaderConfiguration<ViewType>> configuration,
                            std::string_view const &name = "Fast Loader") : hh::Graph<ViewType, IndexRequest>(
       name), configurations_(std::move(configuration)) {
+
+    auto tileLoaderAllCaches =
+        std::make_shared<std::vector<std::shared_ptr<internal::Cache<typename ViewType::data_t>>>>();
+
+    std::vector<uint32_t> sizeMemoryManagerPerLevel = {};
+
     if (!configurations_) {
       std::ostringstream oss;
       oss << "The configuration given to FastLoaderConfiguration is not valid.";
       throw (std::runtime_error(oss.str()));
     }
 
-    std::vector<uint32_t> sizePerLevel = {};
-
-    std::shared_ptr<std::vector<uint32_t>>
-        fullHeightPerLevel = std::make_shared<std::vector<uint32_t>>(),
-        fullWidthPerLevel = std::make_shared<std::vector<uint32_t>>(),
-        fullDepthPerLevel = std::make_shared<std::vector<uint32_t>>(),
-        tileHeightPerLevel = std::make_shared<std::vector<uint32_t>>(),
-        tileWidthPerLevel = std::make_shared<std::vector<uint32_t>>(),
-        tileDepthPerLevel = std::make_shared<std::vector<uint32_t>>();
-
-    std::vector<std::shared_ptr<internal::Cache<typename ViewType::data_t>>> allCaches;
     tileLoader_ = configurations_->tileLoader_;
+    numberChannels_ = this->tileLoader_->numberChannels();
+    numberPyramidLevels_ = this->tileLoader_->numberPyramidLevels();
+    numberChannels_ = tileLoader_->numberChannels();
+
+    fullHeightPerLevel_->reserve(numberPyramidLevels_);
+    fullWidthPerLevel_->reserve(numberPyramidLevels_);
+    fullDepthPerLevel_->reserve(numberPyramidLevels_);
+    tileHeightPerLevel_->reserve(numberPyramidLevels_);
+    tileWidthPerLevel_->reserve(numberPyramidLevels_);
+    tileDepthPerLevel_->reserve(numberPyramidLevels_);
+    viewHeightPerLevel_->reserve(numberPyramidLevels_);
+    viewWidthPerLevel_->reserve(numberPyramidLevels_);
+    viewDepthPerLevel_->reserve(numberPyramidLevels_);
+
+    sizeMemoryManagerPerLevel.reserve(numberPyramidLevels_);
 
     // Getting the size for all levels
-    for (uint32_t level = 0; level < tileLoader_->numberPyramidLevels(); ++level) {
-      sizePerLevel
-          .push_back(
-              (tileHeight(level) + 2 * configurations_->radiusHeight_) *
-                  (tileWidth(level) + 2 * configurations_->radiusWidth_) *
-                  (tileDepth(level) + 2 * configurations_->radiusDepth_) * numberChannels()
-          );
+    for (uint32_t level = 0; level < numberPyramidLevels_; ++level) {
+      fullHeightPerLevel_->push_back(tileLoader_->fullHeight(level));
+      fullWidthPerLevel_->push_back(tileLoader_->fullWidth(level));
+      fullDepthPerLevel_->push_back(tileLoader_->fullDepth(level));
+      tileWidthPerLevel_->push_back(tileLoader_->tileWidth(level));
+      tileHeightPerLevel_->push_back(tileLoader_->tileHeight(level));
+      tileDepthPerLevel_->push_back(tileLoader_->tileDepth(level));
+      viewWidthPerLevel_->push_back(tileWidthPerLevel_->at(level) + 2 * configurations_->radiusWidth_);
+      viewHeightPerLevel_->push_back(tileHeightPerLevel_->at(level) + 2 * configurations_->radiusHeight_);
+      viewDepthPerLevel_->push_back(tileDepthPerLevel_->at(level) + 2 * configurations_->radiusDepth_);
 
-      allCaches
-          .emplace_back(std::make_shared<internal::Cache<typename ViewType::data_t>>(
+      sizeMemoryManagerPerLevel.push_back(
+          numberChannels_ *
+              viewHeightPerLevel_->at(level) * viewWidthPerLevel_->at(level) * viewDepthPerLevel_->at(level));
+
+      tileLoaderAllCaches->emplace_back(
+          std::make_shared<internal::Cache<typename ViewType::data_t>>(
               configurations_->cacheCapacity_[level],
               numberTileHeight(level),
               numberTileWidth(level),
@@ -139,18 +171,10 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
               tileHeight(level),
               tileWidth(level),
               tileDepth(level),
-              numberChannels()));
-
-      fullHeightPerLevel->push_back(tileLoader_->fullHeight(level));
-      fullWidthPerLevel->push_back(tileLoader_->fullWidth(level));
-      fullDepthPerLevel->push_back(tileLoader_->fullDepth(level));
-
-      tileWidthPerLevel->push_back(tileLoader_->tileWidth(level));
-      tileHeightPerLevel->push_back(tileLoader_->tileHeight(level));
-      tileDepthPerLevel->push_back(tileLoader_->tileDepth(level));
+              numberChannels_));
     }
 
-    tileLoader_->allCaches_ = allCaches;
+    tileLoader_->allCaches_ = tileLoaderAllCaches;
 
     // Tasks
     auto viewCounter =
@@ -167,15 +191,15 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
 
       auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
           viewCounter, configurations_->ordered_,
-          fullHeightPerLevel, fullWidthPerLevel, fullDepthPerLevel,
-          tileHeightPerLevel, tileWidthPerLevel, tileDepthPerLevel,
-          numberChannels(),
+          fullHeightPerLevel_, fullWidthPerLevel_, fullDepthPerLevel_,
+          tileHeightPerLevel_, tileWidthPerLevel_, tileDepthPerLevel_,
+          numberChannels_,
           configurations_->radiusHeight_, configurations_->radiusWidth_, configurations_->radiusDepth_,
           configurations_->fillingType_
-          );
+      );
 
       auto mm = std::make_shared<internal::FastLoaderMemoryManager<ViewDataType>>(
-          this->configurations_->viewAvailablePerLevel_, sizePerLevel, configurations_->nbReleasePyramid_);
+          this->configurations_->viewAvailablePerLevel_, sizeMemoryManagerPerLevel, configurations_->nbReleasePyramid_);
       viewWaiter->connectMemoryManager(mm);
       levelGraph_->input(viewWaiter);
       levelGraph_->addEdge(viewWaiter, viewLoader);
@@ -191,12 +215,12 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
             viewCounter, configurations_->ordered_,
             fullHeightPerLevel, fullWidthPerLevel, fullDepthPerLevel,
             tileHeightPerLevel, tileWidthPerLevel, tileDepthPerLevel,
-            numberChannels(),
+            numberChannels,
             configurations_->radiusHeight_, configurations_->radiusWidth_, configurations_->radiusDepth_,
             configurations_->fillingType_);
 
         auto mm = std::make_shared<internal::FastLoaderMemoryManager<ViewDataType>>(
-            this->configurations_->viewAvailablePerLevel_, sizePerLevel, configurations_->nbReleasePyramid_);
+            this->configurations_->viewAvailablePerLevel_, sizeMemoryManagerPerLevel, configurations_->nbReleasePyramid_);
         viewWaiter->connectMemoryManager(mm);
         levelGraph_->input(viewWaiter);
         levelGraph_->addEdge(viewWaiter, viewLoader);
@@ -220,6 +244,10 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
     this->output(viewCounter);
   }
 
+ protected:
+  explicit FastLoaderGraph(std::string_view const &name) : hh::Graph<ViewType, IndexRequest>(name) {}
+
+ public:
   /// @brief FastLoaderGraph destructor
   virtual ~FastLoaderGraph() = default;
 
@@ -254,54 +282,66 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
   /// @param level Level asked [default 0]
   /// @return AbstractView height for a level
   [[nodiscard]] uint32_t viewHeight(uint32_t level = 0) const {
-    return tileLoader_->tileHeight(level) + 2 * radiusHeight();
+    return this->tileHeight(level) + 2 * radiusHeight();
   }
   /// @brief AbstractView width accessor for a level
   /// @param level Level asked [default 0]
   /// @return AbstractView width for a level
   [[nodiscard]] uint32_t viewWidth(uint32_t level = 0) const {
-    return tileLoader_->tileWidth(level) + 2 * radiusWidth();
+    return this->tileWidth(level) + 2 * radiusWidth();
   }
   /// @brief AbstractView depth accessor for a level
   /// @param level Level asked [default 0]
   /// @return AbstractView depth for a level
   [[nodiscard]] uint32_t viewDepth(uint32_t level = 0) const {
-    return tileLoader_->tileDepth(level) + 2 * radiusDepth();
+    return this->tileDepth(level) + 2 * radiusDepth();
   }
+
+  /// \brief Getter to the number of channels
+  /// \return Number of pixel's channels
+  [[nodiscard]] uint32_t numberChannels() const { return tileLoader_->numberChannels(); }
 
   /// @brief Tile height accessor for a level
   /// @param level Level asked [default 0]
   /// @return Tile height for a level
-  [[nodiscard]] uint32_t tileHeight(uint32_t level = 0) const { return tileLoader_->tileHeight(level); }
+  [[nodiscard]] uint32_t tileHeight(uint32_t level = 0) const {
+    return this->tileHeightPerLevel_->at(level);
+  }
 
   /// @brief Tile width accessor for a level
   /// @param level Level asked [default 0]
   /// @return Tile width for a level
-  [[nodiscard]] uint32_t tileWidth(uint32_t level = 0) const { return tileLoader_->tileWidth(level); }
+  [[nodiscard]] uint32_t tileWidth(uint32_t level = 0) const {
+    return this->tileWidthPerLevel_->at(level);
+  }
 
   /// @brief Tile depth accessor for a level
   /// @param level Level asked [default 0]
   /// @return Tile depth for a level
-  [[nodiscard]] uint32_t tileDepth(uint32_t level = 0) const { return tileLoader_->tileDepth(level); }
-
-  /// \brief Getter to the number of channels
-  /// \return Number of pixel's channels
-  [[nodiscard]] virtual uint32_t numberChannels() const { return tileLoader_->numberChannels(); }
+  [[nodiscard]] uint32_t tileDepth(uint32_t level = 0) const {
+    return this->tileDepthPerLevel_->at(level);
+  }
 
   /// @brief Number tiles in height accessor for a level
-  /// @param level Level asked [default 0]
+  /// @param level Level asked
   /// @return Number tiles in height for a level
-  [[nodiscard]] uint32_t numberTileHeight(uint32_t level = 0) const { return tileLoader_->numberTileHeight(level); }
+  [[nodiscard]] uint32_t numberTileHeight(uint32_t level = 0) const {
+    return (uint32_t) ceil((double) (this->fullHeight(level)) / this->tileHeight(level));
+  }
 
   /// @brief Number tiles in width accessor for a level
-  /// @param level Level asked [default 0]
+  /// @param level Level asked
   /// @return Number tiles in width for a level
-  [[nodiscard]] uint32_t numberTileWidth(uint32_t level = 0) const { return tileLoader_->numberTileWidth(level); }
+  [[nodiscard]] uint32_t numberTileWidth(uint32_t level = 0) const {
+    return (uint32_t) ceil((double) (this->fullWidth(level)) / this->tileWidth(level));
+  }
 
   /// @brief Number tiles in depth accessor for a level
-  /// @param level Level asked [default 0]
+  /// @param level Level asked
   /// @return Number tiles in depth for a level
-  [[nodiscard]] uint32_t numberTileDepth(uint32_t level = 0) const { return tileLoader_->numberTileDepth(level); }
+  [[nodiscard]] uint32_t numberTileDepth(uint32_t level = 0) const {
+    return (uint32_t) ceil((double) (this->fullDepth(level)) / this->tileDepth(level));
+  }
 
   /// @brief Number tiles accessor for a level
   /// @param level Level asked [default 0]
@@ -335,6 +375,7 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
     for (auto indexRequest: generateIndexRequestForAllViews(level)) { this->pushData(indexRequest); }
   }
 
+ private:
   /// @brief Request a AbstractView for a level, can be used when the FastLoaderGraph is embedded into another graph to generate
   /// easily FastImageGraph inputs
   /// @param rowIndex AbstractView's row requested
@@ -355,11 +396,13 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
   /// @return A vector of ViewRequest
   std::vector<std::shared_ptr<IndexRequest>> generateIndexRequestForAllViews(uint32_t level = 0) {
     std::vector<std::shared_ptr<IndexRequest>> ret = {};
-    for (auto step : configurations_->traversal_->traversal(level)) {
+    for (auto step: this->configurations_->traversal_->traversal(
+        this->numberTileHeight(level), this->numberTileWidth(level), this->numberTileDepth(level))) {
       ret.push_back(generateIndexRequest(step[0], step[1], step[2], level));
     }
-    return ret;
+   return ret;
   }
+
 };
 
 }

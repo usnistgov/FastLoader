@@ -213,11 +213,9 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
 
       for (uint32_t layerCopy = startLayerCopy; layerCopy < endLayerCopy; ++layerCopy) {
         deltaPhysicalLayer =
-            (layerCopy
-                - (indexLayer * physicalTileDepth)) * physicalTileWidth * physicalTileHeight;
+            (layerCopy - (indexLayer * physicalTileDepth)) * physicalTileWidth * physicalTileHeight;
         deltaLogicalLayer =
-            (layerCopy
-                - ((layerCopy / logicalTileDepth) * logicalTileDepth)) * logicalTileWidth * logicalTileHeight;
+            (layerCopy - ((layerCopy / logicalTileDepth) * logicalTileDepth)) * logicalTileWidth * logicalTileHeight;
 
         for (size_t indexRow = indexMinPhysicalRow; indexRow < indexMaxPhysicalRow; ++indexRow) {
           startRowCopy = std::max(uint32_t(indexRow * physicalTileHeight), minRow);
@@ -225,11 +223,9 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
 
           for (uint32_t rowCopy = startRowCopy; rowCopy < endRowCopy; ++rowCopy) {
             deltaPhysicalRow =
-                (rowCopy
-                    - (indexRow * physicalTileHeight)) * physicalTileWidth;
+                (rowCopy - (indexRow * physicalTileHeight)) * physicalTileWidth;
             deltaLogicalRow =
-                (rowCopy
-                    - ((rowCopy / logicalTileHeight) * logicalTileHeight)) * logicalTileWidth;
+                (rowCopy - ((rowCopy / logicalTileHeight) * logicalTileHeight)) * logicalTileWidth;
 
             for (size_t indexColumn = indexMinPhysicalColumn; indexColumn < indexMaxPhysicalColumn; ++indexColumn) {
               startColCopy = std::max(uint32_t(indexColumn * physicalTileWidth), minColumn);
