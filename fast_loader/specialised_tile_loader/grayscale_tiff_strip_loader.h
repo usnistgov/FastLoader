@@ -37,7 +37,7 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
   TIFF *
       tiff_ = nullptr;             ///< Tiff file pointer
 
-  uint32_t
+  size_t
       fullHeight_ = 0,          ///< Full height in pixel
   fullWidth_ = 0,           ///< Full width in pixel
   fullDepth_ = 0,           ///< Full depth in pixel
@@ -58,7 +58,7 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
   GrayscaleTiffStripLoader(
       size_t numberThreads,
       std::string const &filePath,
-      uint32_t tileWidth, uint32_t tileHeight, uint32_t tileDepth)
+      size_t tileWidth, size_t tileHeight, size_t tileDepth)
       : fl::AbstractTileLoader<fl::DefaultView<DataType>>("GrayscaleTiffStripLoader", numberThreads, filePath),
         tileWidth_(tileWidth), tileHeight_(tileHeight), tileDepth_(tileDepth) {
     short samplesPerPixel = 0;
@@ -103,17 +103,17 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
   /// @param indexLayerGlobalTile Tile layer index
   /// @param level Tile's level
   void loadTileFromFile(std::shared_ptr<std::vector<DataType>> tile,
-                        uint32_t indexRowGlobalTile,
-                        uint32_t indexColGlobalTile,
-                        uint32_t indexLayerGlobalTile,
-                        [[maybe_unused]] uint32_t level) override {
+                        size_t indexRowGlobalTile,
+                        size_t indexColGlobalTile,
+                        size_t indexLayerGlobalTile,
+                        [[maybe_unused]] size_t level) override {
 
     tdata_t buf;
     uint32 row, layer;
 
     buf = _TIFFmalloc(TIFFScanlineSize(tiff_));
 
-    uint32_t
+    size_t
         startLayer = indexLayerGlobalTile * tileDepth_,
         endLayer = std::min((indexLayerGlobalTile + 1) * tileDepth_, fullDepth_),
         startRow = indexRowGlobalTile * tileHeight_,
@@ -133,7 +133,7 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
                 break;
               case 16:copyRow<uint16_t>(buf, tile, layer - startLayer, row - startRow, startCol, endCol);
                 break;
-              case 32:copyRow<uint32_t>(buf, tile, layer - startLayer, row - startRow, startCol, endCol);
+              case 32:copyRow<size_t>(buf, tile, layer - startLayer, row - startRow, startCol, endCol);
                 break;
               case 64:copyRow<uint64_t>(buf, tile, layer - startLayer, row - startRow, startCol, endCol);
                 break;
@@ -197,35 +197,35 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
   /// @brief Tiff file height
   /// @param level Tiff level [not used]
   /// @return Full height
-  [[nodiscard]] uint32_t fullHeight([[maybe_unused]] uint32_t level) const override { return fullHeight_; }
+  [[nodiscard]] size_t fullHeight([[maybe_unused]] size_t level) const override { return fullHeight_; }
   /// @brief Tiff full width
   /// @param level Tiff level [not used]
   /// @return Full width
-  [[nodiscard]] uint32_t fullWidth([[maybe_unused]] uint32_t level) const override { return fullWidth_; }
+  [[nodiscard]] size_t fullWidth([[maybe_unused]] size_t level) const override { return fullWidth_; }
   /// @brief Tiff full depth
   /// @param level Tiff level [not used]
   /// @return Full Depth
-  [[nodiscard]] uint32_t fullDepth([[maybe_unused]] uint32_t level) const override { return fullDepth_; }
+  [[nodiscard]] size_t fullDepth([[maybe_unused]] size_t level) const override { return fullDepth_; }
 
   /// @brief Tiff tile width
   /// @param level Tiff level [not used]
   /// @return Tile width
-  [[nodiscard]] uint32_t tileWidth([[maybe_unused]] uint32_t level) const override { return tileWidth_; }
+  [[nodiscard]] size_t tileWidth([[maybe_unused]] size_t level) const override { return tileWidth_; }
   /// @brief Tiff tile height
   /// @param level Tiff level [not used]
   /// @return Tile height
-  [[nodiscard]] uint32_t tileHeight([[maybe_unused]] uint32_t level) const override { return tileHeight_; }
+  [[nodiscard]] size_t tileHeight([[maybe_unused]] size_t level) const override { return tileHeight_; }
   /// @brief Tiff tile depth
   /// @param level Tiff level [not used]
   /// @return Tile depth
-  [[nodiscard]] uint32_t tileDepth([[maybe_unused]] uint32_t level) const override { return tileDepth_; }
+  [[nodiscard]] size_t tileDepth([[maybe_unused]] size_t level) const override { return tileDepth_; }
 
   /// @brief Tiff bits per sample
   /// @return Size of a sample in bits
   [[nodiscard]] short bitsPerSample() const override { return bitsPerSample_; }
   /// @brief Level accessor
   /// @return 1
-  [[nodiscard]] uint32_t numberPyramidLevels() const override { return 1; }
+  [[nodiscard]] size_t numberPyramidLevels() const override { return 1; }
 
  private:
   /// @brief Private function to copy and cast the values
@@ -239,11 +239,11 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
   template<typename FileType>
   void copyRow(tdata_t src,
                std::shared_ptr<std::vector<DataType>> &dest,
-               uint32_t layer,
-               uint32_t row,
-               uint32_t startCol,
-               uint32_t endCol) {
-    for (uint32_t col = startCol; col < endCol; col++) {
+               size_t layer,
+               size_t row,
+               size_t startCol,
+               size_t endCol) {
+    for (size_t col = startCol; col < endCol; col++) {
       dest->data()[
           tileWidth_ * tileHeight_ * layer
               + tileWidth_ * row

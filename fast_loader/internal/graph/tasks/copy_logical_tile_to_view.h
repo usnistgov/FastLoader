@@ -16,9 +16,9 @@ class CopyLogicalCacheToView :
     public hh::AbstractTask<fl::internal::TileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>> {
 
  private:
-  uint32_t const numberChannels_;
+  size_t const numberChannels_;
  public:
-  explicit CopyLogicalCacheToView(size_t numberThreads, uint32_t const numberChannels) :
+  explicit CopyLogicalCacheToView(size_t numberThreads, size_t const numberChannels) :
       hh::AbstractTask<
           fl::internal::TileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>>
           ("CopyLogicalCacheToView", numberThreads),
@@ -30,7 +30,7 @@ class CopyLogicalCacheToView :
     std::shared_ptr<fl::internal::CachedTile<typename ViewType::data_t>> logicalCachedTile =
         adaptiveTileRequest->logicalCachedTile();
 
-    uint32_t
+    size_t
         tileWidth = logicalTileRequest->view()->tileWidth(),
         tileHeight = logicalTileRequest->view()->tileHeight(),
         viewWidth = logicalTileRequest->view()->viewWidth(),

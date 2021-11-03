@@ -36,17 +36,17 @@ void testFillingConstant() {
   uint16_t const tileDepth = 2;
 
   std::vector<size_t> const radii{0, 1, 2, 3};
-  std::vector<uint32_t> const minMaxIndex = {0, 2};
+  std::vector<size_t> const minMaxIndex = {0, 2};
 
   // Radius / Layer / Row / Column
   std::unordered_map<
       size_t,
       std::unordered_map<
-          uint32_t,
+          size_t,
           std::unordered_map<
-              uint32_t,
+              size_t,
               std::unordered_map<
-                  uint32_t,
+                  size_t,
                   std::vector<int>
               >
           >
@@ -1269,17 +1269,17 @@ void testFillingReplicate() {
   uint16_t const tileDepth = 2;
 
   std::vector<size_t> const radii{0, 1, 2, 3};
-  std::vector<uint32_t> const minMaxIndex = {0, 2};
+  std::vector<size_t> const minMaxIndex = {0, 2};
 
   // Radius / Layer / Row / Column
   std::unordered_map<
       size_t,
       std::unordered_map<
-          uint32_t,
+          size_t,
           std::unordered_map<
-              uint32_t,
+              size_t,
               std::unordered_map<
-                  uint32_t,
+                  size_t,
                   std::vector<int>
               >
           >

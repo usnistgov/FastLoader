@@ -22,20 +22,25 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
  private:
   using DataType = typename ViewType::data_t;
 
-  std::shared_ptr<std::vector<uint32_t>> const
-      physicalTileHeights_ = std::make_shared<std::vector<uint32_t>>(),
-      physicalTileWidths_ = std::make_shared<std::vector<uint32_t>>(),
-      physicalTileDepths_ = std::make_shared<std::vector<uint32_t>>(),
-      logicalTileHeights_ = std::make_shared<std::vector<uint32_t>>(),
-      logicalTileWidths_ = std::make_shared<std::vector<uint32_t>>(),
-      logicalTileDepths_ = std::make_shared<std::vector<uint32_t>>(),
+  std::shared_ptr<std::vector<size_t>> const
+      physicalTileHeights_ = std::make_shared<std::vector<size_t>>(),
+      physicalTileWidths_ = std::make_shared<std::vector<size_t>>(),
+      physicalTileDepths_ = std::make_shared<std::vector<size_t>>(),
+      logicalTileHeights_ = std::make_shared<std::vector<size_t>>(),
+      logicalTileWidths_ = std::make_shared<std::vector<size_t>>(),
+      logicalTileDepths_ = std::make_shared<std::vector<size_t>>(),
       fullHeights_{},
       fullWidths_{},
       fullDepths_{},
-      numberLogicalTilesCache_ = std::make_shared<std::vector<uint32_t>>();
+      numberLogicalTilesCache_ = std::make_shared<std::vector<size_t>>();
 
-  uint32_t const
+  size_t const
       numberChannels_{};
+
+  size_t
+      maxNumberLogicalTilesRow_ = 0,
+      maxNumberLogicalTilesCol_ = 0,
+      maxNumberLogicalTilesLayer_ = 0;
 
   std::shared_ptr<std::vector<std::shared_ptr<internal::Cache<typename ViewType::data_t>>>>
       logicalTileCaches_;
@@ -48,19 +53,18 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
       numberElementsToTL_ = 0;
 
  public:
-  MapperLogicalPhysical(std::shared_ptr<std::vector<uint32_t>> physicalTileHeights,
-                        std::shared_ptr<std::vector<uint32_t>> physicalTileWidths,
-                        std::shared_ptr<std::vector<uint32_t>> physicalTileDepths,
-                        std::shared_ptr<std::vector<uint32_t>> logicalTileHeights,
-                        std::shared_ptr<std::vector<uint32_t>> logicalTileWidths,
-                        std::shared_ptr<std::vector<uint32_t>> logicalTileDepths,
-                        std::shared_ptr<std::vector<uint32_t>> fullHeights,
-                        std::shared_ptr<std::vector<uint32_t>> fullWidths,
-                        std::shared_ptr<std::vector<uint32_t>> fullDepths,
-                        std::shared_ptr<std::vector<uint32_t>> numberLogicalTilesCaches,
-                        uint32_t const numberChannels,
-                        std::shared_ptr<std::vector<std::shared_ptr<internal::Cache<DataType>>>>
-                        logicalTileCaches)
+  MapperLogicalPhysical(std::shared_ptr<std::vector<size_t>> physicalTileHeights,
+                        std::shared_ptr<std::vector<size_t>> physicalTileWidths,
+                        std::shared_ptr<std::vector<size_t>> physicalTileDepths,
+                        std::shared_ptr<std::vector<size_t>> logicalTileHeights,
+                        std::shared_ptr<std::vector<size_t>> logicalTileWidths,
+                        std::shared_ptr<std::vector<size_t>> logicalTileDepths,
+                        std::shared_ptr<std::vector<size_t>> fullHeights,
+                        std::shared_ptr<std::vector<size_t>> fullWidths,
+                        std::shared_ptr<std::vector<size_t>> fullDepths,
+                        std::shared_ptr<std::vector<size_t>> numberLogicalTilesCaches,
+                        size_t const numberChannels,
+                        std::shared_ptr<std::vector<std::shared_ptr<internal::Cache<DataType>>>> logicalTileCaches)
       : hh::AbstractTask<AdaptiveTileRequest<ViewType>, TileRequest<ViewType>>("LogicalToPhysicalMapper"),
         physicalTileHeights_(std::move(physicalTileHeights)),
         physicalTileWidths_(std::move(physicalTileWidths)),
@@ -71,46 +75,49 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
         fullHeights_(std::move(fullHeights)), fullWidths_(std::move(fullWidths)), fullDepths_(std::move(fullDepths)),
         numberLogicalTilesCache_(std::move(numberLogicalTilesCaches)),
         numberChannels_(numberChannels),
-        logicalTileCaches_(std::move(logicalTileCaches)) {}
+        logicalTileCaches_(std::move(logicalTileCaches)) {
+    for (size_t level = 0; level < fullWidths_->size(); ++level) {
+      maxNumberLogicalTilesRow_ =
+          std::max(
+              maxNumberLogicalTilesRow_,
+              (size_t) ceil((double) (fullHeights_->at(level)) / logicalTileHeights_->at(level))
+          );
+      maxNumberLogicalTilesCol_ =
+          std::max(
+              maxNumberLogicalTilesCol_,
+              (size_t) ceil((double) (fullWidths_->at(level)) / logicalTileWidths_->at(level))
+          );
+      maxNumberLogicalTilesLayer_ =
+          std::max(
+              maxNumberLogicalTilesLayer_,
+              (size_t) ceil((double) (fullDepths_->at(level)) / logicalTileDepths_->at(level))
+          );
+    }
+
+  }
 
   virtual ~MapperLogicalPhysical() = default;
 
-  void initialize() override {cache_ = this->logicalTileCaches_->at(this->graphId());}
+  void initialize() override { cache_ = this->logicalTileCaches_->at(this->graphId()); }
 
   void execute(std::shared_ptr<TileRequest<ViewType>> tileRequest) override {
-
-    uint32_t const
+    size_t const
         level = tileRequest->view()->level(),
         indexRowLogicalTile = tileRequest->indexRowTileAsked(),
         indexColLogicalTile = tileRequest->indexColTileAsked(),
         indexLayerLogicalTile = tileRequest->indexLayerTileAsked();
-    
-//    global_mutex.lock();
-//    std::cout << "Try to get: (" << indexRowLogicalTile << ", " << indexColLogicalTile << ", " << indexLayerLogicalTile << ")" << std::endl;
-//    global_mutex.unlock();
-
     std::shared_ptr<fl::internal::CachedTile<DataType>> logicalCachedTile =
         this->cache_->lockedTile(indexRowLogicalTile, indexColLogicalTile, indexLayerLogicalTile);
-    
-//    global_mutex.lock();
-//    std::cout << "Got: (" << indexRowLogicalTile << ", " << indexColLogicalTile << ", " << indexLayerLogicalTile << ")" << std::endl;
-//    global_mutex.unlock();
 
     if (!logicalCachedTile->isNewTile()) {
-//      global_mutex.lock();
-//      std::cout << "Reuse" << std::endl;
-//      global_mutex.unlock();
-      ++ this->numberElementDirectToCopy_;
+      ++this->numberElementDirectToCopy_;
       this->addResult(std::make_shared<fl::internal::AdaptiveTileRequest<ViewType>>(tileRequest, logicalCachedTile));
     } else {
-//      global_mutex.lock();
-//      std::cout << "New Tile" << std::endl;
-//      global_mutex.unlock();
       logicalCachedTile->newTile(false);
       //Need to create N AdaptiveTileRequest to fill the logical Cache Tile from tile loader
       std::vector<std::shared_ptr<fl::internal::AdaptiveTileRequest<ViewType>>> adaptiveTileRequests{};
 
-      uint32_t const
+      size_t const
           logicalTileHeight = logicalTileHeights_->at(level),
           logicalTileWidth = logicalTileWidths_->at(level),
           logicalTileDepth = logicalTileDepths_->at(level),
@@ -126,13 +133,13 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
           maxColumn = std::min((indexColLogicalTile + 1) * logicalTileWidth, fullWidths_->at(level)),
           maxLayer = std::min((indexLayerLogicalTile + 1) * logicalTileDepth, fullDepths_->at(level)),
 
-          numberPhysicalTilesRow = (uint32_t) ceil((double) (fullHeights_->at(level)) / physicalTileHeight),
-          numberPhysicalTilesCol = (uint32_t) ceil((double) (fullWidths_->at(level)) / physicalTileWidth),
-          numberPhysicalTilesLayer = (uint32_t) ceil((double) (fullDepths_->at(level)) / physicalTileDepth),
+          numberPhysicalTilesRow = (size_t) ceil((double) (fullHeights_->at(level)) / physicalTileHeight),
+          numberPhysicalTilesCol = (size_t) ceil((double) (fullWidths_->at(level)) / physicalTileWidth),
+          numberPhysicalTilesLayer = (size_t) ceil((double) (fullDepths_->at(level)) / physicalTileDepth),
 
-          numberLogicalTilesRow = (uint32_t) ceil((double) (fullHeights_->at(level)) / logicalTileHeight),
-          numberLogicalTilesCol = (uint32_t) ceil((double) (fullWidths_->at(level)) / logicalTileWidth),
-          numberLogicalTilesLayer = (uint32_t) ceil((double) (fullDepths_->at(level)) / logicalTileDepth),
+          numberLogicalTilesRow = (size_t) ceil((double) (fullHeights_->at(level)) / logicalTileHeight),
+          numberLogicalTilesCol = (size_t) ceil((double) (fullWidths_->at(level)) / logicalTileWidth),
+          numberLogicalTilesLayer = (size_t) ceil((double) (fullDepths_->at(level)) / logicalTileDepth),
 
           indexMinPhysicalRow = minRow / physicalTileHeight,
           indexMinPhysicalColumn = minColumn / physicalTileWidth,
@@ -141,13 +148,11 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
           indexMaxPhysicalRow = std::min((maxRow / physicalTileHeight) + 1, numberPhysicalTilesRow),
           indexMaxPhysicalColumn = std::min((maxColumn / physicalTileWidth) + 1, numberPhysicalTilesCol),
           indexMaxPhysicalLayer = std::min((maxLayer / physicalTileDepth) + 1, numberPhysicalTilesLayer),
-          // TODO: Check if ID works also with multiple levels ! 
-          id =
-      indexLayerLogicalTile * numberLogicalTilesLayer * numberLogicalTilesRow * numberLogicalTilesCol
-          + indexRowLogicalTile * numberLogicalTilesRow
-          + indexColLogicalTile * numberLogicalTilesCol * numberLogicalTilesRow;
+          id = indexLayerLogicalTile * maxNumberLogicalTilesRow_ * maxNumberLogicalTilesCol_
+          + indexRowLogicalTile * maxNumberLogicalTilesCol_
+          + indexColLogicalTile;
 
-      uint32_t
+      size_t
           startRowCopy = 0,
           startColCopy = 0,
           startLayerCopy = 0,
@@ -162,19 +167,19 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
           widthToCopy = 0;
 
       for (size_t indexLayer = indexMinPhysicalLayer; indexLayer < indexMaxPhysicalLayer; ++indexLayer) {
-        startLayerCopy = std::max(uint32_t(indexLayer * physicalTileDepth), minLayer);
-        endLayerCopy = std::min(uint32_t((indexLayer + 1) * physicalTileDepth), maxLayer);
+        startLayerCopy = std::max(size_t(indexLayer * physicalTileDepth), minLayer);
+        endLayerCopy = std::min(size_t((indexLayer + 1) * physicalTileDepth), maxLayer);
         depthToCopy = endLayerCopy - startLayerCopy;
         deltaLogicalRow = 0;
 
         for (size_t indexRow = indexMinPhysicalRow; indexRow < indexMaxPhysicalRow; ++indexRow) {
-          startRowCopy = std::max(uint32_t(indexRow * physicalTileHeight), minRow);
-          endRowCopy = std::min(uint32_t((indexRow + 1) * physicalTileHeight), maxRow);
+          startRowCopy = std::max(size_t(indexRow * physicalTileHeight), minRow);
+          endRowCopy = std::min(size_t((indexRow + 1) * physicalTileHeight), maxRow);
           heightToCopy = endRowCopy - startRowCopy;
           deltaLogicalColumn = 0;
           for (size_t indexColumn = indexMinPhysicalColumn; indexColumn < indexMaxPhysicalColumn; ++indexColumn) {
-            startColCopy = std::max(uint32_t(indexColumn * physicalTileWidth), minColumn);
-            endColCopy = std::min(uint32_t((indexColumn + 1) * physicalTileWidth), maxColumn);
+            startColCopy = std::max(size_t(indexColumn * physicalTileWidth), minColumn);
+            endColCopy = std::min(size_t((indexColumn + 1) * physicalTileWidth), maxColumn);
             widthToCopy = endColCopy - startColCopy;
 
 
@@ -204,9 +209,9 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
             adaptiveTileRequest->addCopy(
                 CopyVolume(
                     {
-                        (uint32_t) (startRowCopy - indexRow * physicalTileHeight),
-                        (uint32_t) (startColCopy - indexColumn * physicalTileWidth),
-                        (uint32_t) (startLayerCopy - indexLayer * physicalTileDepth),
+                        (size_t) (startRowCopy - indexRow * physicalTileHeight),
+                        (size_t) (startColCopy - indexColumn * physicalTileWidth),
+                        (size_t) (startLayerCopy - indexLayer * physicalTileDepth),
                         heightToCopy, widthToCopy, depthToCopy},
                     {
                         deltaLogicalRow, deltaLogicalColumn, deltaLogicalLayer,
@@ -223,56 +228,24 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
         }
         deltaLogicalLayer += depthToCopy;
       }
-      
-      
+
       size_t const numberOfAdaptiveTileRequests = adaptiveTileRequests.size();
-      
-//      global_mutex.lock();
-//      std::cout << "Tile (" << indexRowLogicalTile << ", " << indexColLogicalTile << ", " << indexLayerLogicalTile << ") #id" << id << " has " << numberOfAdaptiveTileRequests << " parts" << std::endl;
-//      global_mutex.unlock();
-      
-      for (auto tr : adaptiveTileRequests){
-//        global_mutex.lock();
-//        std::cout << "Sending Tile (" << indexRowLogicalTile << ", " << indexColLogicalTile << ", " << indexLayerLogicalTile << ") #id" << id << std::endl;
-//        global_mutex.unlock();
-        ++ this->numberElementsToTL_;
+
+      for (auto tr: adaptiveTileRequests) {
+        ++this->numberElementsToTL_;
         tr->numberPhysicalTileRequests(numberOfAdaptiveTileRequests);
         this->addResult(tr);
-        
-      }
-      
-      
-//      std::for_each(adaptiveTileRequests.begin(), adaptiveTileRequests.end(),
-//                    [&numberOfAdaptiveTileRequests, this]
-//                        (std::shared_ptr<fl::internal::AdaptiveTileRequest<ViewType>> tr) {
-//                      ++ this->numberElementsToTL_;
-//                      tr->numberPhysicalTileRequests(numberOfAdaptiveTileRequests);
-//                      this->addResult(tr);
-//                    });
 
+      }
     }
 
   }
 
   [[nodiscard]] std::string extraPrintingInformation() const override {
-//    size_t const
-//      toCopy =  this->numberElementDirectToCopy_,
-//      toTL = this->numberElementsToTL_,
-//      total = toCopy + toTL;
-//
-//    std::ostringstream oss;
-//    oss
-//      << "#elements direct to copy: " << toCopy << "(" << (double) toCopy / total * 100 << "%)\n"
-//      << "#elements to TileLoader: " << toTL << "(" << (double) toTL / total * 100 << "%)\n";
-//    return oss.str();
-
     std::ostringstream oss;
     oss << "Miss rate: "
         << std::setprecision(2) << this->cache_->miss() * 1. / (this->cache_->miss() + this->cache_->hit()) << "%"
-        << "\n" << this->numberElementDirectToCopy_  << "/" << this->numberElementsToTL_ << "\n";
-
-//        << "Disk Access time: " << durationPrinter(cache_->accessTime()) << std::endl
-//        << "Disk Recycle time: " << durationPrinter(cache_->recycleTime()) << std::endl;
+        << "\n" << this->numberElementDirectToCopy_ << "/" << this->numberElementsToTL_ << "\n";
     return oss.str();
   }
 

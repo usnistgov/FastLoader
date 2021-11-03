@@ -32,8 +32,8 @@
 //class BlockRecursiveTraversal : public AbstractTraversal<ViewType> {
 //
 // private:
-//  uint32_t depth_;
-//  std::vector<std::pair<uint32_t, uint32_t>> tilesPerLevel_;
+//  size_t depth_;
+//  std::vector<std::pair<size_t, size_t>> tilesPerLevel_;
 //
 // public:
 //
@@ -42,35 +42,35 @@
 //  float downscaleFactor = 2
 //  )
 //  : AbstractTraversal<ViewType>("Block recursive", tl) {
-//    auto numTileRow = static_cast<uint32_t>(std::ceil((double) tl->fullHeight(0) / tl->tileHeight(0)));
-//    auto numTileCol = static_cast<uint32_t>(std::ceil((double) tl->fullWidth(0) / tl->tileWidth(0)));
+//    auto numTileRow = static_cast<size_t>(std::ceil((double) tl->fullHeight(0) / tl->tileHeight(0)));
+//    auto numTileCol = static_cast<size_t>(std::ceil((double) tl->fullWidth(0) / tl->tileWidth(0)));
 //    auto maxDim = std::max(numTileCol, numTileRow);
 //    depth_ = ceil(log2(maxDim) / log2(downscaleFactor));
-//    for (uint32_t l = 0; l <= depth_; l++) {
+//    for (size_t l = 0; l <= depth_; l++) {
 //      tilesPerLevel_.push_back({numTileRow, numTileCol});
-//      numTileCol = static_cast<uint32_t>(ceil((double) numTileCol / downscaleFactor));
-//      numTileRow = static_cast<uint32_t>(ceil((double) numTileRow / downscaleFactor));
+//      numTileCol = static_cast<size_t>(ceil((double) numTileCol / downscaleFactor));
+//      numTileRow = static_cast<size_t>(ceil((double) numTileRow / downscaleFactor));
 //    }
 //  }
 //
 //  virtual ~BlockRecursiveTraversal() = default;
 //
-//  std::vector<std::pair<uint32_t, uint32_t>> traversal([[maybe_unused]] uint32_t level) const override {
-//    std::vector<std::pair<uint32_t, uint32_t >> traversal;
+//  std::vector<std::pair<size_t, size_t>> traversal([[maybe_unused]] size_t level) const override {
+//    std::vector<std::pair<size_t, size_t >> traversal;
 //    blockTraversal(0, 0, depth_ - level, traversal);
 //    return traversal;
 //  }
 //
 // private:
 //
-//  bool isValid(uint32_t row, uint32_t col, uint32_t depth) const {
+//  bool isValid(size_t row, size_t col, size_t depth) const {
 //    return (row < tilesPerLevel_[depth].first && col < tilesPerLevel_[depth].second);
 //  }
 //
-//  void blockTraversal(uint32_t row,
-//                      uint32_t col,
-//                      uint32_t depth,
-//                      std::vector<std::pair<uint32_t, uint32_t >> &traversal) const {
+//  void blockTraversal(size_t row,
+//                      size_t col,
+//                      size_t depth,
+//                      std::vector<std::pair<size_t, size_t >> &traversal) const {
 //    if (!isValid(row, col, depth)) {
 //      return;
 //    }

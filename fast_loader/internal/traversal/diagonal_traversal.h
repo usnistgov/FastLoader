@@ -38,26 +38,26 @@
 //
 //  virtual ~DiagonalTraversal() = default;
 //
-//  [[nodiscard]] std::vector<std::pair<uint32_t, uint32_t>> traversal(uint32_t level) const override {
-//    std::vector<std::pair<uint32_t, uint32_t>> traversal;
-//    uint32_t
+//  [[nodiscard]] std::vector<std::pair<size_t, size_t>> traversal(size_t level) const override {
+//    std::vector<std::pair<size_t, size_t>> traversal;
+//    size_t
 //        pos = 0;
 //    int32_t
 //        i = 0,
 //        j = 0;
 //    traversal.assign(this->numberTileHeight(level) * this->numberTileWidth(level),
-//                     std::pair<uint32_t, uint32_t>(0, 0));
+//                     std::pair<size_t, size_t>(0, 0));
 //
 //    for (int32_t k = 0; k < (int32_t) this->numberTileHeight(level); k++) {
-//      traversal[pos].first = (uint32_t) k;
+//      traversal[pos].first = (size_t) k;
 //      traversal[pos].second = 0;
 //      pos++;
 //      i = k - 1;
 //      j = 1;
 //
 //      while (isValid(i, j, this->numberTileHeight(level), this->numberTileWidth(level))) {
-//        traversal[pos].first = (uint32_t) i;
-//        traversal[pos].second = (uint32_t) j;
+//        traversal[pos].first = (size_t) i;
+//        traversal[pos].second = (size_t) j;
 //        pos++;
 //        i--;
 //        j++;
@@ -65,14 +65,14 @@
 //    }
 //
 //    for (int32_t k = 1; k < (int32_t) this->numberTileWidth(level); k++) {
-//      traversal[pos].first = (uint32_t) this->numberTileHeight(level) - 1;
-//      traversal[pos].second = (uint32_t) k;
+//      traversal[pos].first = (size_t) this->numberTileHeight(level) - 1;
+//      traversal[pos].second = (size_t) k;
 //      pos++;
 //      i = this->numberTileHeight(level) - 2;
 //      j = k + 1;
 //      while (isValid(i, j, this->numberTileHeight(level), this->numberTileWidth(level))) {
-//        traversal[pos].first = (uint32_t) i;
-//        traversal[pos].second = (uint32_t) j;
+//        traversal[pos].first = (size_t) i;
+//        traversal[pos].second = (size_t) j;
 //        pos++;
 //        i--;
 //        j++;
@@ -88,7 +88,7 @@
 //  /// \param n Number of rows
 //  /// \param m Number of columns
 //  /// \return True if valid, else False
-//  static bool isValid(int32_t const &row, int32_t const &col, uint32_t const &n, uint32_t const &m) {
+//  static bool isValid(int32_t const &row, int32_t const &col, size_t const &n, size_t const &m) {
 //    return !(row < 0 || row >= (int32_t) n || col >= (int32_t) m || col < 0);
 //  }
 //};

@@ -43,7 +43,7 @@ void testBasicChannel() {
   uint16_t const tileWidth = 2;
   uint16_t const tileDepth = 2;
 
-  std::vector<uint32_t> const vectorChannels{1, 2, 3};
+  std::vector<size_t> const vectorChannels{1, 2, 3};
 
   for (auto numberChannels : vectorChannels) {
     auto tl = std::make_shared<VirtualFileTileChannelLoader>(
@@ -74,10 +74,10 @@ void testBasicChannel() {
       auto startRow = view->tileRowIndex() * view->tileHeight();
       auto startCol = view->tileColIndex() * view->tileWidth();
 
-      for (uint32_t layer = 0; layer < view->realDataDepth(); ++layer) {
-        for (uint32_t row = 0; row < view->realDataHeight(); ++row) {
-          for (uint32_t col = 0; col < view->realDataWidth(); ++col) {
-            for (uint32_t channel = 0; channel < numberChannels; ++channel) {
+      for (size_t layer = 0; layer < view->realDataDepth(); ++layer) {
+        for (size_t row = 0; row < view->realDataHeight(); ++row) {
+          for (size_t col = 0; col < view->realDataWidth(); ++col) {
+            for (size_t channel = 0; channel < numberChannels; ++channel) {
               ASSERT_EQ(
                   view->viewOrigin()[
                       (layer * tileHeight * tileWidth + row * tileWidth + col) * numberChannels + channel],
@@ -102,19 +102,19 @@ void testViewWithRadiusConstant() {
   uint16_t const tileWidth = 2;
   uint16_t const tileDepth = 2;
 
-  std::vector<uint32_t> const vectorChannels{1, 2, 3};
-  std::vector<uint32_t> const radii{1, 2, 3};
+  std::vector<size_t> const vectorChannels{1, 2, 3};
+  std::vector<size_t> const radii{1, 2, 3};
 
   std::unordered_map<
-      uint32_t, // Channels
+      size_t, // Channels
       std::unordered_map<
-          uint32_t, // Radius
+          size_t, // Radius
           std::unordered_map<
-              uint32_t, // Layer
+              size_t, // Layer
               std::unordered_map<
-                  uint32_t, // Row
+                  size_t, // Row
                   std::unordered_map<
-                      uint32_t, // Col
+                      size_t, // Col
                       std::vector<int>
                   >
               >
@@ -5180,19 +5180,19 @@ void testViewWithRadiusReplicateFilling() {
   uint16_t const tileWidth = 2;
   uint16_t const tileDepth = 2;
 
-  std::vector<uint32_t> const vectorChannels{1, 2, 3};
-  std::vector<uint32_t> const radii{1, 2, 3};
+  std::vector<size_t> const vectorChannels{1, 2, 3};
+  std::vector<size_t> const radii{1, 2, 3};
 
   std::unordered_map<
-      uint32_t, // Channels
+      size_t, // Channels
       std::unordered_map<
-          uint32_t, // Radius
+          size_t, // Radius
           std::unordered_map<
-              uint32_t, // Layer
+              size_t, // Layer
               std::unordered_map<
-                  uint32_t, // Row
+                  size_t, // Row
                   std::unordered_map<
-                      uint32_t, // Col
+                      size_t, // Col
                       std::vector<int>
                   >
               >
@@ -12346,12 +12346,12 @@ void testViewWithRadiusReplicateFilling() {
 }
 
 std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> adaptiveFLChannels(
-    uint32_t fileSize, uint32_t logicalSize, uint32_t physicalTile, uint32_t numberChannels) {
+    size_t fileSize, size_t logicalSize, size_t physicalTile, size_t numberChannels) {
   auto tl = std::make_shared<VirtualFileAdaptiveTileChannelLoader>(
       1,
       fileSize, fileSize, fileSize,
-      std::vector<uint32_t>{logicalSize}, std::vector<uint32_t>{logicalSize}, std::vector<uint32_t>{logicalSize},
-      std::vector<uint32_t>{5},
+      std::vector<size_t>{logicalSize}, std::vector<size_t>{logicalSize}, std::vector<size_t>{logicalSize},
+      std::vector<size_t>{5},
       physicalTile, physicalTile, physicalTile, numberChannels);
   auto options = std::make_unique<fl::FastLoaderConfiguration<fl::DefaultView<int>>>(tl);
   options->radius(2);
@@ -12359,7 +12359,7 @@ std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> adaptiveFLChannels(
   return std::make_shared<fl::FastLoaderGraph<fl::DefaultView<int>>>(std::move(options));
 }
 
-std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> basicFLChannels(uint32_t fileSize, uint32_t physicalTile, uint32_t numberChannels) {
+std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> basicFLChannels(size_t fileSize, size_t physicalTile, size_t numberChannels) {
   auto tl = std::make_shared<VirtualFileTileChannelLoader>(
       1,
       fileSize, fileSize, fileSize,
@@ -12371,9 +12371,9 @@ std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> basicFLChannels(uint3
 }
 
 void testAdaptiveTLChannels() {
-  uint32_t const fileSize = 5;
-  std::vector<uint32_t> const tileSize{1, 2, 3, 5};
-  std::vector<uint32_t> const vNumberChannels{1, 2, 3, 5};
+  size_t const fileSize = 5;
+  std::vector<size_t> const tileSize{1, 2, 3, 5};
+  std::vector<size_t> const vNumberChannels{1, 2, 3, 5};
 
   for(auto numberChannels: vNumberChannels) {
     for (auto physicalTile : tileSize) {

@@ -84,7 +84,7 @@ namespace internal {
 /// vvvvvv\n
 /// vvvvvv\n
 /// vvvvvv\n
-/// viewOrigin(uint32_t radius) will return the top left hand corner pointer of the view as if the radius is of value
+/// viewOrigin(size_t radius) will return the top left hand corner pointer of the view as if the radius is of value
 /// given, viewOrigin(1) will return:\n
 /// vvvvvv\n
 /// vpvvvv\n
@@ -94,14 +94,14 @@ namespace internal {
 /// vvvvvv\n
 /// and viewOrigin(0) will return the same pointer as originCentralTile().
 /// @details
-/// To access smaller radius views, the geometry viewHeight(uint32_t radius)/viewWidth(uint32_t radius)/viewDepth(uint32_t radius) are available, which
-/// can be used with viewOrigin(uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth) to access the starting location of
+/// To access smaller radius views, the geometry viewHeight(size_t radius)/viewWidth(size_t radius)/viewDepth(size_t radius) are available, which
+/// can be used with viewOrigin(size_t radiusHeight, size_t radiusWidth, size_t radiusDepth) to access the starting location of
 /// a smaller radius view.\n
 /// So to access all elements from the central tile (with viewDepth of 0 and radiusDepth of 0):
 /// @code
 /// while (auto view = fl.getBlockingResult()) {
-///   for (uint32_t row = 0; row < view->tileHeight(); ++row) {
-///     for (uint32_t col = 0; col < view->tileWidth(); ++col) {
+///   for (size_t row = 0; row < view->tileHeight(); ++row) {
+///     for (size_t col = 0; col < view->tileWidth(); ++col) {
 ///       auto val = *(view->originCentralTile() + (row * view->viewWidth() + col));
 ///       // Do stuff with val
 ///     }
@@ -112,9 +112,9 @@ namespace internal {
 /// So to access all elements from the central tile that come directly from the file:
 /// @code
 ///   while (auto view = fl.getBlockingResult()) {
-///    for (uint32_t layer = 0; layer < view->realDataDepth(); ++layer) {
-///     for (uint32_t row = 0; row < view->realDataHeight(); ++row) {
-///       for (uint32_t col = 0; col < view->realDataWidth(); ++col) {
+///    for (size_t layer = 0; layer < view->realDataDepth(); ++layer) {
+///     for (size_t row = 0; row < view->realDataHeight(); ++row) {
+///       for (size_t col = 0; col < view->realDataWidth(); ++col) {
 ///         auto val = *(view->originCentralTile() + (layer * view->viewHeight() * view->viewWidth() + row * view->viewWidth() + col));
 ///         // Do stuff with val
 ///      }
@@ -155,88 +155,88 @@ class AbstractView {
 
   /// @brief AbstractView's radius height accessor
   /// @return AbstractView's radius height
-  [[nodiscard]] uint32_t radiusHeight() const { return this->viewData()->radiusHeight(); }
+  [[nodiscard]] size_t radiusHeight() const { return this->viewData()->radiusHeight(); }
 
   /// @brief AbstractView's radius width accessor
   /// @return AbstractView's radius width
-  [[nodiscard]] uint32_t radiusWidth() const { return this->viewData()->radiusWidth(); }
+  [[nodiscard]] size_t radiusWidth() const { return this->viewData()->radiusWidth(); }
 
   /// @brief AbstractView's radius depth accessor
   /// @return AbstractView's radius depth
-  [[nodiscard]] uint32_t radiusDepth() const { return this->viewData()->radiusDepth(); }
+  [[nodiscard]] size_t radiusDepth() const { return this->viewData()->radiusDepth(); }
 
   /// @brief AbstractView pyramid level accessor
   /// @return AbstractView pyramid level
-  [[nodiscard]] uint32_t level() const { return this->viewData()->level(); }
+  [[nodiscard]] size_t level() const { return this->viewData()->level(); }
 
   /// @brief Tile height accessor
   /// @return Tile height
-  [[nodiscard]] uint32_t tileHeight() const { return this->viewData()->tileHeight(); }
+  [[nodiscard]] size_t tileHeight() const { return this->viewData()->tileHeight(); }
   /// @brief Tile width accessor
   /// @return Tile width
-  [[nodiscard]] uint32_t tileWidth() const { return this->viewData()->tileWidth(); }
+  [[nodiscard]] size_t tileWidth() const { return this->viewData()->tileWidth(); }
   /// @brief Tile depth accessor
   /// @return Tile depth
-  [[nodiscard]] uint32_t tileDepth() const { return this->viewData()->tileDepth(); }
+  [[nodiscard]] size_t tileDepth() const { return this->viewData()->tileDepth(); }
   /// @brief Number of channels accessor
   /// @return Number of channels
-  [[nodiscard]] uint32_t numberChannels() const { return this->viewData()->numberChannels(); }
+  [[nodiscard]] size_t numberChannels() const { return this->viewData()->numberChannels(); }
 
   /// @brief Real data height in a central tile accessor
   /// @return Real data height in a central tile
-  [[nodiscard]] uint32_t realDataHeight() const {
+  [[nodiscard]] size_t realDataHeight() const {
     return std::min(viewData()->fullHeight(), (tileRowIndex() + 1) * tileHeight()) - tileGlobalRow();
   }
   /// @brief Real data width in a central tile accessor
   /// @return Real data width in a central tile
-  [[nodiscard]] uint32_t realDataWidth() const {
+  [[nodiscard]] size_t realDataWidth() const {
     return std::min(viewData()->fullWidth(), (tileColIndex() + 1) * tileWidth()) - tileGlobalCol();
   }
 
   /// @brief Real data width in a central tile accessor
   /// @return Real data width in a central tile
-  [[nodiscard]] uint32_t realDataDepth() const {
+  [[nodiscard]] size_t realDataDepth() const {
     return std::min(viewData()->fullDepth(), (tileLayerIndex() + 1) * tileDepth()) - tileGlobalLayer();
   }
 
   /// @brief Default view height accessor
   /// @return Default view height
-  [[nodiscard]] uint32_t viewHeight() const { return this->viewData()->viewHeight(); }
+  [[nodiscard]] size_t viewHeight() const { return this->viewData()->viewHeight(); }
   /// @brief Default view width accessor
   /// @return Default view width
-  [[nodiscard]] uint32_t viewWidth() const { return this->viewData()->viewWidth(); }
+  [[nodiscard]] size_t viewWidth() const { return this->viewData()->viewWidth(); }
   /// @brief Default view depth accessor
   /// @return Default view depth
-  [[nodiscard]] uint32_t viewDepth() const { return this->viewData()->viewDepth(); }
+  [[nodiscard]] size_t viewDepth() const { return this->viewData()->viewDepth(); }
 
   /// @brief Row position in the file grid of the central tile accessor
   /// @return Row position in the file grid of the central tile
-  [[nodiscard]] uint32_t tileRowIndex() const { return this->viewData()->indexRowCenterTile(); }
+  [[nodiscard]] size_t tileRowIndex() const { return this->viewData()->indexRowCenterTile(); }
 
   /// @brief Column position in the file grid of the central tile accessor
   /// @return Column position in the file grid of the central tile
-  [[nodiscard]] uint32_t tileColIndex() const { return this->viewData()->indexColCenterTile(); }
+  [[nodiscard]] size_t tileColIndex() const { return this->viewData()->indexColCenterTile(); }
 
   /// @brief Depth position in the file grid of the central tile accessor
   /// @return Depth position in the file grid of the central tile
-  [[nodiscard]] uint32_t tileLayerIndex() const { return this->viewData()->indexLayerCenterTile(); }
+  [[nodiscard]] size_t tileLayerIndex() const { return this->viewData()->indexLayerCenterTile(); }
 
   /// @brief Position of the front upper left hand corner pixel row of the central tile in the file accessor
   /// @return Position of the front upper left hand corner pixel row of the central tile in the file
-  [[nodiscard]] uint32_t tileGlobalRow() const { return tileRowIndex() * tileHeight(); }
+  [[nodiscard]] size_t tileGlobalRow() const { return tileRowIndex() * tileHeight(); }
 
   /// @brief Position of the front upper left hand corner pixel column of the central tile in the file accessor
   /// @return Position of the front upper left hand corner pixel column of the central tile in the file
-  [[nodiscard]] uint32_t tileGlobalCol() const { return tileColIndex() * tileWidth(); }
+  [[nodiscard]] size_t tileGlobalCol() const { return tileColIndex() * tileWidth(); }
 
   /// @brief Position of the front upper left hand corner pixel layer of the central tile in the file accessor
   /// @return Position of the front upper left hand corner pixel layer of the central tile in the file
-  [[nodiscard]] uint32_t tileGlobalLayer() const { return tileLayerIndex() * tileDepth(); }
+  [[nodiscard]] size_t tileGlobalLayer() const { return tileLayerIndex() * tileDepth(); }
 
   /// @brief AbstractView height for another radius height accessor
   /// @param radiusHeight Other radius asked
   /// @return AbstractView height for another radius
-  [[nodiscard]] uint32_t viewHeight(uint32_t radiusHeight) const {
+  [[nodiscard]] size_t viewHeight(size_t radiusHeight) const {
     if (radiusHeight <= this->viewData()->radiusHeight()) {
       return this->viewData()->viewHeight() - (2 * (this->viewData()->radiusHeight() - radiusHeight));
     } else {
@@ -250,7 +250,7 @@ class AbstractView {
   /// @brief AbstractView width for another radius accessor
   /// @param radiusWidth Other radius width asked
   /// @return AbstractView width for another radius width
-  [[nodiscard]] uint32_t viewWidth(uint32_t radiusWidth) const {
+  [[nodiscard]] size_t viewWidth(size_t radiusWidth) const {
     if (radiusWidth <= this->viewData()->radiusWidth()) {
       return this->viewData()->viewWidth() - (2 * (this->viewData()->radiusWidth() - radiusWidth));
     } else {
@@ -264,7 +264,7 @@ class AbstractView {
   /// @brief AbstractView depth for another radius accessor
   /// @param radiusDepth Other radius depth asked
   /// @return AbstractView depth for another radius depth
-  [[nodiscard]] uint32_t viewDepth(uint32_t radiusDepth) const {
+  [[nodiscard]] size_t viewDepth(size_t radiusDepth) const {
     if (radiusDepth <= this->viewData()->radiusDepth()) {
       return this->viewData()->viewDepth() - (2 * (this->viewData()->radiusDepth() - radiusDepth));
     } else {
@@ -283,7 +283,7 @@ class AbstractView {
   /// @brief AbstractView origins centered in the central tile for a smaller radius accessor
   /// @param sharedRadius Radius asked inferior or equal to the one given to FastLoader
   /// @return AbstractView origins centered in the central tile for a smaller radius
-  [[nodiscard]] DataType *viewOrigin(uint32_t sharedRadius) const {
+  [[nodiscard]] DataType *viewOrigin(size_t sharedRadius) const {
     return viewOrigin(sharedRadius, sharedRadius, sharedRadius);
   }
 
@@ -292,7 +292,7 @@ class AbstractView {
   /// @param radiusWidth Width radius asked inferior or equal to the one given to FastLoader
   /// @param radiusDepth Depth radius asked inferior or equal to the one given to FastLoader
   /// @return AbstractView origins centered in the central tile for a smaller radius
-  [[nodiscard]] DataType *viewOrigin(uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth) const {
+  [[nodiscard]] DataType *viewOrigin(size_t radiusHeight, size_t radiusWidth, size_t radiusDepth) const {
     if (radiusHeight <= this->viewData()->radiusHeight() &&
         radiusWidth <= this->viewData()->radiusWidth() &&
         radiusDepth <= this->viewData()->radiusDepth()) {
@@ -333,7 +333,7 @@ class AbstractView {
   /// @param sharedRadius Radius of the extracted view centered in the central tile
   /// @return Vector containing the contiguous view
   /// @attention AbstractView<DataType>::extractViewDeepCopy() do a deep copy and this memory is not managed by FastLoader.
-  std::shared_ptr<std::vector<DataType>> extractViewDeepCopy(uint32_t sharedRadius){
+  std::shared_ptr<std::vector<DataType>> extractViewDeepCopy(size_t sharedRadius){
     return extractViewDeepCopy(sharedRadius, sharedRadius, sharedRadius);
   }
 
@@ -343,9 +343,9 @@ class AbstractView {
   /// @param radiusDepth Depth radius asked inferior or equal to the one given to FastLoader
   /// @return Vector containing the contiguous view
   /// @attention AbstractView<DataType>::extractViewDeepCopy() do a deep copy and this memory is not managed by FastLoader.
-  std::shared_ptr<std::vector<DataType>> extractViewDeepCopy(uint32_t radiusHeight,
-                                                             uint32_t radiusWidth,
-                                                             uint32_t radiusDepth) {
+  std::shared_ptr<std::vector<DataType>> extractViewDeepCopy(size_t radiusHeight,
+                                                             size_t radiusWidth,
+                                                             size_t radiusDepth) {
     if (radiusHeight <= this->viewData()->radiusHeight() &&
         radiusWidth <= this->viewData()->radiusWidth() &&
         radiusDepth <= this->viewData()->radiusDepth()) {
@@ -361,8 +361,8 @@ class AbstractView {
                   + (this->radiusWidth() - radiusWidth)
           ) * numberChannels();
 
-      for (uint32_t layer = 0; layer < viewDepth(radiusDepth); ++layer) {
-        for (uint32_t row = 0; row < viewHeight(radiusHeight); ++row) {
+      for (size_t layer = 0; layer < viewDepth(radiusDepth); ++layer) {
+        for (size_t row = 0; row < viewHeight(radiusHeight); ++row) {
           std::copy_n(
               viewOriginBase + (layer * viewWidth() * viewHeight() + row * viewWidth()) * numberChannels(),
               viewWidth(radiusWidth) * numberChannels(),
@@ -405,7 +405,7 @@ class AbstractView {
   /// @return The same output stream as parameter for chaining
   template<class CAST=DataType>
   std::ostream &printView(size_t setWidthPrint = 0, std::ostream &os = std::cout) const {
-    uint32_t
+    size_t
         row = 0,
         col = 0,
         channel = 0;

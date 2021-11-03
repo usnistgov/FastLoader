@@ -42,7 +42,7 @@ namespace internal {
 /// @tparam ViewType Type of the view
 template<class ViewType>
 class TileRequest {
-  uint32_t
+  size_t
       indexRowTileAsked_{}, ///< Row index tile needed
       indexColTileAsked_{}, ///< Column index tile needed
       indexLayerTileAsked_{}; ///< Layer index tile needed
@@ -60,7 +60,7 @@ class TileRequest {
   /// @param indexLayerTileAsked Requested layer index tile
   /// @param view AbstractView to copy into
   TileRequest(
-      uint32_t indexRowTileAsked, uint32_t indexColTileAsked, uint32_t indexLayerTileAsked,
+      size_t indexRowTileAsked, size_t indexColTileAsked, size_t indexLayerTileAsked,
       std::shared_ptr<ViewType> const &view)
       : indexRowTileAsked_(indexRowTileAsked), indexColTileAsked_(indexColTileAsked),
       indexLayerTileAsked_(indexLayerTileAsked), view_(view) {}
@@ -70,13 +70,13 @@ class TileRequest {
 
   /// @brief Row index tile accessor
   /// @return Row index tile
-  [[nodiscard]] uint32_t const &indexRowTileAsked() const { return indexRowTileAsked_; }
+  [[nodiscard]] size_t const &indexRowTileAsked() const { return indexRowTileAsked_; }
   /// @brief Column index tile accessor
   /// @return Column index tile
-  [[nodiscard]] uint32_t const &indexColTileAsked() const { return indexColTileAsked_; }
+  [[nodiscard]] size_t const &indexColTileAsked() const { return indexColTileAsked_; }
   /// @brief Layer index tile accessor
   /// @return Layer index tile
-  [[nodiscard]] uint32_t const & indexLayerTileAsked() const { return indexLayerTileAsked_; }
+  [[nodiscard]] size_t const & indexLayerTileAsked() const { return indexLayerTileAsked_; }
 
   /// @brief AbstractView accessor
   /// @return AbstractView

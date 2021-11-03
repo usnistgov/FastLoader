@@ -22,19 +22,19 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
 
  private:
   using DataType = typename ViewType::data_t;
-  std::shared_ptr<std::vector<uint32_t>>
-      physicalTileHeightPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
-      physicalTileWidthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
-      physicalTileDepthPerLevel_ = std::make_shared<std::vector<uint32_t>>(),
-      numberLogicalTilesCachePerLevel_ = std::make_shared<std::vector<uint32_t>>();
+  std::shared_ptr<std::vector<size_t>>
+      physicalTileHeightPerLevel_ = std::make_shared<std::vector<size_t>>(),
+      physicalTileWidthPerLevel_ = std::make_shared<std::vector<size_t>>(),
+      physicalTileDepthPerLevel_ = std::make_shared<std::vector<size_t>>(),
+      numberLogicalTilesCachePerLevel_ = std::make_shared<std::vector<size_t>>();
 
  public:
   AdaptiveFastLoaderGraph(
       std::unique_ptr<FastLoaderConfiguration<ViewType>> configuration,
-      std::vector<uint32_t> const &logicalTileHeightRequestedPerLevel,
-      std::vector<uint32_t> const &logicalTileWidthRequestedPerLevel,
-      std::vector<uint32_t> const &logicalTileDepthRequestedPerLevel,
-      std::vector<uint32_t> numberLogicalTilesCachePerLevel = {},
+      std::vector<size_t> const &logicalTileHeightRequestedPerLevel,
+      std::vector<size_t> const &logicalTileWidthRequestedPerLevel,
+      std::vector<size_t> const &logicalTileDepthRequestedPerLevel,
+      std::vector<size_t> numberLogicalTilesCachePerLevel = {},
       std::string_view const &name = "Adaptive Tile Loader")
       : fl::FastLoaderGraph<ViewType>(name) {
 
@@ -44,7 +44,7 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
         allAdaptiveCaches =
         std::make_shared<std::vector<std::shared_ptr<internal::Cache<DataType>>>>();
 
-    std::vector<uint32_t>
+    std::vector<size_t>
         sizeMemoryManagerPerLevel = {};
 
     size_t
@@ -57,7 +57,7 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
 
     if (numberLogicalTilesCachePerLevel.empty()) {
       numberLogicalTilesCachePerLevel.reserve(this->numberPyramidLevels_);
-      for (uint32_t level = 0; level < this->numberPyramidLevels_; ++level) {
+      for (size_t level = 0; level < this->numberPyramidLevels_; ++level) {
         numberLogicalTilesCachePerLevel.push_back(5);
       }
     }
@@ -69,15 +69,21 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
       throw std::runtime_error(
           "The number of logical tile dimensions and number of logical caches requested should match the number of pyramid level.");
     }
-        
-    if(std::any_of(logicalTileHeightRequestedPerLevel.begin(), logicalTileHeightRequestedPerLevel.end(), [](uint32_t const & val){return val == 0;})
-       || std::any_of(logicalTileWidthRequestedPerLevel.begin(), logicalTileWidthRequestedPerLevel.end(), [](uint32_t const & val){return val == 0;})
-       || std::any_of(logicalTileDepthRequestedPerLevel.begin(), logicalTileDepthRequestedPerLevel.end(), [](uint32_t const & val){return val == 0;})){
+
+    if (std::any_of(logicalTileHeightRequestedPerLevel.begin(),
+                    logicalTileHeightRequestedPerLevel.end(),
+                    [](size_t const &val) { return val == 0; })
+        || std::any_of(logicalTileWidthRequestedPerLevel.begin(),
+                       logicalTileWidthRequestedPerLevel.end(),
+                       [](size_t const &val) { return val == 0; })
+        || std::any_of(logicalTileDepthRequestedPerLevel.begin(),
+                       logicalTileDepthRequestedPerLevel.end(),
+                       [](size_t const &val) { return val == 0; })) {
       throw std::runtime_error("The logical tile requested should be superior to 0.");
     }
 
     if (std::any_of(numberLogicalTilesCachePerLevel.begin(), numberLogicalTilesCachePerLevel.end(),
-                    [](uint32_t const &val) { return val == 0; })) {
+                    [](size_t const &val) { return val == 0; })) {
       throw std::runtime_error("The logical tile cache requested should be superior to 0.");
     }
 
@@ -104,7 +110,7 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
     }
 
     // Getting the size for all levels
-    for (uint32_t level = 0; level < this->numberPyramidLevels_; ++level) {
+    for (size_t level = 0; level < this->numberPyramidLevels_; ++level) {
       this->fullHeightPerLevel_->push_back(this->tileLoader_->fullHeight(level));
       this->fullWidthPerLevel_->push_back(this->tileLoader_->fullWidth(level));
       this->fullDepthPerLevel_->push_back(this->tileLoader_->fullDepth(level));
@@ -117,9 +123,6 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
       physicalTileHeightPerLevel_->push_back(this->tileLoader_->tileWidth(level));
       physicalTileWidthPerLevel_->push_back(this->tileLoader_->tileHeight(level));
       physicalTileDepthPerLevel_->push_back(this->tileLoader_->tileDepth(level));
-//      logicalTileHeightPerLevel_->push_back(logicalTileHeightRequestedPerLevel.at(level));
-//      logicalTileWidthPerLevel_->push_back(logicalTileWidthRequestedPerLevel.at(level));
-//      logicalTileDepthPerLevel_->push_back(logicalTileDepthRequestedPerLevel.at(level));
       numberLogicalTilesCachePerLevel_->push_back(numberLogicalTilesCachePerLevel.at(level));
 
       sizeMemoryManagerPerLevel.push_back(
@@ -129,9 +132,9 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
       tileLoaderAllCaches->push_back(
           std::make_shared<internal::Cache<DataType>>(
               this->configurations_->cacheCapacity_[level],
-              (uint32_t) ceil((double) (this->fullHeight(level)) / physicalTileHeightPerLevel_->at(level)),
-              (uint32_t) ceil((double) (this->fullWidth(level)) / physicalTileWidthPerLevel_->at(level)),
-              (uint32_t) ceil((double) (this->fullDepth(level)) / physicalTileDepthPerLevel_->at(level)),
+              (size_t) ceil((double) (this->fullHeight(level)) / physicalTileHeightPerLevel_->at(level)),
+              (size_t) ceil((double) (this->fullWidth(level)) / physicalTileWidthPerLevel_->at(level)),
+              (size_t) ceil((double) (this->fullDepth(level)) / physicalTileDepthPerLevel_->at(level)),
               physicalTileHeightPerLevel_->at(level),
               physicalTileWidthPerLevel_->at(level),
               physicalTileDepthPerLevel_->at(level),
@@ -185,7 +188,6 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
 
       auto mapperLogicalPhysical = std::make_shared<internal::MapperLogicalPhysical<ViewType>>(
           physicalTileHeightPerLevel_, physicalTileWidthPerLevel_, physicalTileDepthPerLevel_,
-//          logicalTileHeightPerLevel_, logicalTileWidthPerLevel_, logicalTileDepthPerLevel_,
           this->tileHeightPerLevel_, this->tileWidthPerLevel_, this->tileDepthPerLevel_,
           this->fullHeightPerLevel_, this->fullWidthPerLevel_, this->fullDepthPerLevel_,
           numberLogicalTilesCachePerLevel_,
@@ -229,7 +231,75 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
       // Output
       this->levelGraph_->output(copyLogicalTileToView);
     }
-      //TODO Add CUDA graph
+#ifdef HH_USE_CUDA
+      else if constexpr (std::is_base_of<UnifiedView<typename ViewType::data_t>, ViewType>::value) {
+        using ViewDataType = internal::UnifiedViewData<typename ViewType::data_t>;
+              auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
+            viewCounter,
+            this->configurations_->ordered_,
+            this->fullHeightPerLevel_, this->fullWidthPerLevel_, this->fullDepthPerLevel_,
+            this->tileHeightPerLevel_, this->tileWidthPerLevel_, this->tileDepthPerLevel_,
+            this->numberChannels_,
+            this->configurations_->radiusHeight_,
+            this->configurations_->radiusWidth_,
+            this->configurations_->radiusDepth_,
+            this->configurations_->fillingType_
+        );
+
+        auto mm = std::make_shared<internal::FastLoaderMemoryManager<ViewDataType>>(
+            this->configurations_->viewAvailablePerLevel_,
+            sizeMemoryManagerPerLevel,
+            this->configurations_->nbReleasePyramid_);
+
+        auto viewLoader =
+            std::make_shared<internal::ViewLoader<ViewType, ViewDataType>>(this->configurations_->borderCreator_);
+
+        auto mapperLogicalPhysical = std::make_shared<internal::MapperLogicalPhysical<ViewType>>(
+            physicalTileHeightPerLevel_, physicalTileWidthPerLevel_, physicalTileDepthPerLevel_,
+            this->tileHeightPerLevel_, this->tileWidthPerLevel_, this->tileDepthPerLevel_,
+            this->fullHeightPerLevel_, this->fullWidthPerLevel_, this->fullDepthPerLevel_,
+            numberLogicalTilesCachePerLevel_,
+            this->numberChannels_,
+            allAdaptiveCaches
+        );
+
+        auto directToCopyStateManager = std::make_shared<
+            hh::StateManager<
+                fl::internal::AdaptiveTileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>
+            >
+        >(std::make_shared<internal::DirectToCopyState<ViewType>>());
+
+        auto copyLogicalTileToView = std::make_shared<fl::internal::CopyLogicalCacheToView<ViewType>>(
+            numberThreadsCopyCacheView, this->numberChannels_);
+
+        auto toTLStateManager = std::make_shared<
+            hh::StateManager<fl::internal::TileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>>>
+            (std::make_shared<fl::internal::ToTileLoaderState<ViewType>>());
+
+        auto tlCounterStateManager = std::make_shared<
+            hh::StateManager<fl::internal::AdaptiveTileRequest<ViewType>, fl::internal::TileRequest<ViewType>>>
+            (std::make_shared<fl::internal::TileLoaderCounterState<ViewType>>());
+
+        viewWaiter->connectMemoryManager(mm);
+        this->levelGraph_->input(viewWaiter);
+        this->levelGraph_->addEdge(viewWaiter, viewLoader);
+
+        this->levelGraph_->addEdge(viewLoader, mapperLogicalPhysical);
+        // Direct Copy if cache found
+        this->levelGraph_->addEdge(mapperLogicalPhysical, directToCopyStateManager);
+        this->levelGraph_->addEdge(directToCopyStateManager, copyLogicalTileToView);
+
+
+        //Route with tileLoader
+        this->levelGraph_->addEdge(mapperLogicalPhysical, toTLStateManager);
+        this->levelGraph_->addEdge(toTLStateManager, this->tileLoader_);
+        this->levelGraph_->addEdge(this->tileLoader_, tlCounterStateManager);
+        this->levelGraph_->addEdge(tlCounterStateManager, copyLogicalTileToView);
+
+        // Output
+        this->levelGraph_->output(copyLogicalTileToView);
+      }
+#endif // HH_USE_CUDA
     else {
       throw std::runtime_error("The View Data Type inside of the used View is not known to construct the graph.");
     }

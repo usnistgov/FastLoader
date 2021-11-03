@@ -33,11 +33,11 @@ namespace internal {
 /// @tparam DataType Internal view's type
 template<class ViewDataType>
 class FastLoaderMemoryManager
-    : public hh::StaticMemoryManager<ViewDataType, std::vector<uint32_t>, std::vector<uint32_t>, uint32_t> {
+    : public hh::StaticMemoryManager<ViewDataType, std::vector<size_t>, std::vector<size_t>, size_t> {
  private:
-  uint32_t
+  size_t
       level_ = {}; ///< Memory's manager level
-  std::vector<uint32_t> const
+  std::vector<size_t> const
       viewAvailablePerLevel_ = {}, ///< Number of views available for all levels
   sizePerLevel_ = {}, ///< AbstractView's size for all levels
   releasePerLevel_ = {}; ///< Number of release for all levels
@@ -48,11 +48,11 @@ class FastLoaderMemoryManager
 /// @param releasePerLevel Number of release for all levels
 /// @param level Memory manager level
   FastLoaderMemoryManager(
-      const std::vector<uint32_t> &viewAvailablePerLevel,
-      const std::vector<uint32_t> &sizePerLevel,
-      const std::vector<uint32_t> &releasePerLevel,
-      uint32_t level = 0) :
-      hh::StaticMemoryManager<ViewDataType, std::vector<uint32_t>, std::vector<uint32_t>, uint32_t>
+      const std::vector<size_t> &viewAvailablePerLevel,
+      const std::vector<size_t> &sizePerLevel,
+      const std::vector<size_t> &releasePerLevel,
+      size_t level = 0) :
+      hh::StaticMemoryManager<ViewDataType, std::vector<size_t>, std::vector<size_t>, size_t>
           (viewAvailablePerLevel[level], sizePerLevel, releasePerLevel, level),
       level_(level),
       viewAvailablePerLevel_(viewAvailablePerLevel),

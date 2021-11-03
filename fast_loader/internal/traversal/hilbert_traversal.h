@@ -37,23 +37,23 @@
 //
 //  virtual ~HilbertTraversal() = default;
 //
-//  [[nodiscard]] std::vector<std::pair<uint32_t, uint32_t>> traversal(uint32_t level) const override {
-//    std::vector<std::pair<uint32_t, uint32_t>> traversal;
+//  [[nodiscard]] std::vector<std::pair<size_t, size_t>> traversal(size_t level) const override {
+//    std::vector<std::pair<size_t, size_t>> traversal;
 //
-//    uint32_t
+//    size_t
 //        minX = 0,
 //        minY = 0,
 //        pos = 0,
 //        rowTemp = 0,
 //        colTemp = 0,
-//        minSize = (uint32_t) pow(2,
-//                                 (uint32_t) std::min(log2(this->numberTileHeight(level)),
+//        minSize = (size_t) pow(2,
+//                                 (size_t) std::min(log2(this->numberTileHeight(level)),
 //                                                     log2(this->numberTileWidth(level))));
 //
 //    traversal.resize(this->numberTileHeight(level) * this->numberTileWidth(level),
-//                     std::pair<uint32_t, uint32_t>(0, 0));
+//                     std::pair<size_t, size_t>(0, 0));
 //
-//    for (uint32_t d = 0; d < minSize * minSize; ++d) {
+//    for (size_t d = 0; d < minSize * minSize; ++d) {
 //      d2xy(minSize, pos, rowTemp, colTemp);
 //      traversal[pos].first = rowTemp;
 //      traversal[pos].second = colTemp;
@@ -63,24 +63,24 @@
 //    }
 //
 //    // Filling empty case
-//    for (uint32_t row = 0; row < this->numberTileHeight(level); ++row) {
+//    for (size_t row = 0; row < this->numberTileHeight(level); ++row) {
 //      if (row % 2 == 0) {
-//        for (uint32_t col = minY + 1; col < this->numberTileWidth(level); ++col) {
+//        for (size_t col = minY + 1; col < this->numberTileWidth(level); ++col) {
 //          traversal[pos].first = row;
 //          traversal[pos].second = col;
 //          pos += 1;
 //        }
 //      } else {
-//        for (uint32_t col = this->numberTileWidth(level) - 1; col > minY; --col) {
+//        for (size_t col = this->numberTileWidth(level) - 1; col > minY; --col) {
 //          traversal[pos].first = row;
 //          traversal[pos].second = col;
 //          pos += 1;
 //        }
 //      }
 //    }
-//    for (uint32_t i = minY + 1; i < this->numberTileHeight(level); ++i) {
+//    for (size_t i = minY + 1; i < this->numberTileHeight(level); ++i) {
 //      if (i % 2 == 0) {
-//        for (uint32_t j = 0; j < minX + 1; ++j) {
+//        for (size_t j = 0; j < minX + 1; ++j) {
 //          traversal[pos].first = i;
 //          traversal[pos].second = j;
 //          pos += 1;
@@ -88,7 +88,7 @@
 //      } else {
 //        for (int32_t j = minX; j >= 0; --j) {
 //          traversal[pos].first = i;
-//          traversal[pos].second = (uint32_t) j;
+//          traversal[pos].second = (size_t) j;
 //          pos += 1;
 //        }
 //      }
@@ -105,7 +105,7 @@
 //  /// \param y Row
 //  /// \param rx Column rotational
 //  /// \param ry Row rotational
-//  static void rot(uint32_t n, uint32_t &x, uint32_t &y, uint32_t rx, uint32_t ry) {
+//  static void rot(size_t n, size_t &x, size_t &y, size_t rx, size_t ry) {
 //    if (ry == 0) {
 //      if (rx == 1) {
 //        x = n - 1 - x;
@@ -120,12 +120,12 @@
 //  /// \param d Distance from the origin
 //  /// \param x Column
 //  /// \param y Row
-//  static void d2xy(uint32_t n, uint32_t d, uint32_t &x, uint32_t &y) {
-//    uint32_t rx, ry, s, t = d;
+//  static void d2xy(size_t n, size_t d, size_t &x, size_t &y) {
+//    size_t rx, ry, s, t = d;
 //    x = y = 0;
 //    for (s = 1; s < n; s *= 2) {
-//      rx = (uint32_t) 1 & (t / (uint32_t) 2);
-//      ry = (uint32_t) 1 & (t ^ rx);
+//      rx = (size_t) 1 & (t / (size_t) 2);
+//      ry = (size_t) 1 & (t ^ rx);
 //      rot(s, x, y, rx, ry);
 //      x += s * rx;
 //      y += s * ry;

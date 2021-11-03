@@ -41,11 +41,11 @@ class AbstractViewData {
   DataType *
       data_ = nullptr; ///< Real Data
 
-  std::uint32_t
+  std::size_t
       numberOfRelease_ = 0, ///< AbstractView's number of release
   releaseCount_ = 0; ///< AbstractView's release counts
 
-  uint32_t
+  size_t
   // Image size
   fullHeight_ = 0,            ///< Full height
   fullWidth_ = 0,             ///< Full width
@@ -108,12 +108,12 @@ class AbstractViewData {
 
   /// @brief ViewDataType constructor used indirectly by FastLoaderMemoryManager
   /// @param numberOfRelease Number of time the view should be released
-  explicit AbstractViewData(uint32_t numberOfRelease) : numberOfRelease_(numberOfRelease) {}
+  explicit AbstractViewData(size_t numberOfRelease) : numberOfRelease_(numberOfRelease) {}
 
   /// @brief ViewDataType constructor used by FastLoaderMemoryManager
   /// @param releasesPerLevel All view's number of releases for all levels
   /// @param level AbstractView's level
-  AbstractViewData(std::vector<uint32_t> releasesPerLevel, uint32_t level) :
+  AbstractViewData(std::vector<size_t> releasesPerLevel, size_t level) :
       AbstractViewData(releasesPerLevel[level]) {}
 
   /// @brief copy constructor
@@ -158,13 +158,13 @@ class AbstractViewData {
   /// @param numTilesDepth Number of tiles in file depth
   /// @param fillingType Type of view's filling
   void initialize(
-      uint32_t fullHeight, uint32_t fullWidth, uint32_t fullDepth,
-      uint32_t tileHeight, uint32_t tileWidth, uint32_t tileDepth,
-      uint32_t numberChannels,
-      uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth,
-      uint32_t level,
-      uint32_t indexRowCenterTile, uint32_t indexColCenterTile, uint32_t indexLayerCenterTile,
-      uint32_t numTilesHeight, uint32_t numTilesWidth, uint32_t numTilesDepth,
+      size_t fullHeight, size_t fullWidth, size_t fullDepth,
+      size_t tileHeight, size_t tileWidth, size_t tileDepth,
+      size_t numberChannels,
+      size_t radiusHeight, size_t radiusWidth, size_t radiusDepth,
+      size_t level,
+      size_t indexRowCenterTile, size_t indexColCenterTile, size_t indexLayerCenterTile,
+      size_t numTilesHeight, size_t numTilesWidth, size_t numTilesDepth,
       FillingType fillingType) {
 
     fullHeight_ = fullHeight;
@@ -195,11 +195,11 @@ class AbstractViewData {
     minColCentralTile_ = indexColCenterTile_ * tileWidth;
     minLayerCentralTile_ = indexLayerCenterTile_ * tileDepth;
     // Index of the tile overlapped by the view.
-    indexRowMinTile_ = (uint32_t) std::max(
+    indexRowMinTile_ = (size_t) std::max(
         (int32_t) indexRowCenterTile_ - (int32_t) std::ceil((double) radiusHeight_ / tileHeight_), (int32_t) 0);
-    indexColMinTile_ = (uint32_t) std::max(
+    indexColMinTile_ = (size_t) std::max(
         (int32_t) indexColCenterTile_ - (int32_t) std::ceil((double) radiusWidth_ / tileWidth_), (int32_t) 0);
-    indexLayerMinTile_ = (uint32_t) std::max(
+    indexLayerMinTile_ = (size_t) std::max(
         (int32_t) indexLayerCenterTile_ - (int32_t) std::ceil((double) radiusDepth_ / tileDepth_), (int32_t) 0);
     indexRowMaxTile_ = std::min(
         indexRowCenterTile_ + (int32_t) std::ceil((double) radiusHeight_ / tileHeight_) + 1, numTilesHeight_);
@@ -210,11 +210,11 @@ class AbstractViewData {
 
 
     // Position of the lines / columns / layers to copy from the file
-    minRowFile_ = (uint32_t) std::max((int32_t) (minRowCentralTile_ - radiusHeight_), (int32_t) 0);
+    minRowFile_ = (size_t) std::max((int32_t) (minRowCentralTile_ - radiusHeight_), (int32_t) 0);
     maxRowFile_ = std::min((indexRowCenterTile_ + 1) * tileHeight_ + radiusHeight_, fullHeight_);
-    minColFile_ = (uint32_t) std::max((int32_t) (minColCentralTile_ - radiusWidth_), (int32_t) 0);
+    minColFile_ = (size_t) std::max((int32_t) (minColCentralTile_ - radiusWidth_), (int32_t) 0);
     maxColFile_ = std::min((indexColCenterTile_ + 1) * tileWidth_ + radiusWidth_, fullWidth_);
-    minLayerFile_ = (uint32_t) std::max((int32_t) (minLayerCentralTile_ - radiusDepth_), (int32_t) 0);
+    minLayerFile_ = (size_t) std::max((int32_t) (minLayerCentralTile_ - radiusDepth_), (int32_t) 0);
     maxLayerFile_ = std::min((indexLayerCenterTile_ + 1) * tileDepth_ + radiusDepth_, fullDepth_);
 
     // Count of the lines / columns to copy from the file
@@ -242,119 +242,119 @@ class AbstractViewData {
   [[nodiscard]] virtual DataType *data() { return data_; }
   /// @brief Full width accessor
   /// @return Full width
-  [[nodiscard]] uint32_t fullWidth() const { return fullWidth_; }
+  [[nodiscard]] size_t fullWidth() const { return fullWidth_; }
   /// @brief Full height accessor
   /// @return Full height
-  [[nodiscard]] uint32_t fullHeight() const { return fullHeight_; }
+  [[nodiscard]] size_t fullHeight() const { return fullHeight_; }
   /// @brief Full depth accessor
   /// @return Full depth
-  [[nodiscard]] uint32_t fullDepth() const { return fullDepth_; }
+  [[nodiscard]] size_t fullDepth() const { return fullDepth_; }
   /// @brief Tile height accessor
   /// @return Tile height
-  [[nodiscard]] uint32_t tileHeight() const { return tileHeight_; }
+  [[nodiscard]] size_t tileHeight() const { return tileHeight_; }
   /// @brief Tile width accessor
   /// @return Tile width
-  [[nodiscard]] uint32_t tileWidth() const { return tileWidth_; }
+  [[nodiscard]] size_t tileWidth() const { return tileWidth_; }
   /// @brief Tile depth accessor
   /// @return Tile depth
-  [[nodiscard]] uint32_t tileDepth() const { return tileDepth_; }
+  [[nodiscard]] size_t tileDepth() const { return tileDepth_; }
   /// @brief Number of channels accessor
   /// @return Number of channels
-  uint32_t numberChannels() const { return numberChannels_; }
+  size_t numberChannels() const { return numberChannels_; }
   /// @brief AbstractView's radius height accessor
   /// @return AbstractView's radius height
-  [[nodiscard]] uint32_t radiusHeight() const { return radiusHeight_; }
+  [[nodiscard]] size_t radiusHeight() const { return radiusHeight_; }
   /// @brief AbstractView's radius width accessor
   /// @return AbstractView's radius width
-  [[nodiscard]] uint32_t radiusWidth() const { return radiusWidth_; }
+  [[nodiscard]] size_t radiusWidth() const { return radiusWidth_; }
   /// @brief AbstractView's radius depth accessor
   /// @return AbstractView's radius depth
-  [[nodiscard]] uint32_t radiusDepth() const { return radiusDepth_; }
+  [[nodiscard]] size_t radiusDepth() const { return radiusDepth_; }
   /// @brief AbstractView level accessor
   /// @return AbstractView level
-  [[nodiscard]] uint32_t level() const { return level_; }
+  [[nodiscard]] size_t level() const { return level_; }
   /// @brief AbstractView height accessor
   /// @return AbstractView height
-  [[nodiscard]] uint32_t viewHeight() const { return viewHeight_; }
+  [[nodiscard]] size_t viewHeight() const { return viewHeight_; }
   /// @brief AbstractView width accessor
   /// @return AbstractView width
-  [[nodiscard]] uint32_t viewWidth() const { return viewWidth_; }
+  [[nodiscard]] size_t viewWidth() const { return viewWidth_; }
   /// @brief AbstractView depth accessor
   /// @return AbstractView depth
-  [[nodiscard]] uint32_t viewDepth() const { return viewDepth_; }
+  [[nodiscard]] size_t viewDepth() const { return viewDepth_; }
   /// @brief Number of tiles to load accessor
   /// @return Number of tiles to load
-  [[nodiscard]] uint32_t numberTilesToLoad() const { return numberTilesToLoad_; }
+  [[nodiscard]] size_t numberTilesToLoad() const { return numberTilesToLoad_; }
   /// @brief Front top left tile row index accessor
   /// @return Front top left tile row index
-  [[nodiscard]] uint32_t indexRowMinTile() const { return indexRowMinTile_; }
+  [[nodiscard]] size_t indexRowMinTile() const { return indexRowMinTile_; }
   /// @brief Front top left tile column index accessor
   /// @return Front top left tile column index
-  [[nodiscard]] uint32_t indexColMinTile() const { return indexColMinTile_; }
+  [[nodiscard]] size_t indexColMinTile() const { return indexColMinTile_; }
   /// @brief Front top left tile layer index accessor
   /// @return Front top left tile layer index
-  [[nodiscard]] uint32_t indexLayerMinTile() const { return indexLayerMinTile_; }
+  [[nodiscard]] size_t indexLayerMinTile() const { return indexLayerMinTile_; }
   /// @brief Central tile row index accessor
   /// @return Central tile row index
-  [[nodiscard]] uint32_t indexRowCenterTile() const { return indexRowCenterTile_; }
+  [[nodiscard]] size_t indexRowCenterTile() const { return indexRowCenterTile_; }
   /// @brief Central tile column index accessor
   /// @return Central tile column index
-  [[nodiscard]] uint32_t indexColCenterTile() const { return indexColCenterTile_; }
+  [[nodiscard]] size_t indexColCenterTile() const { return indexColCenterTile_; }
   /// @brief Central tile layer index accessor
   /// @return Central tile layer index
-  [[nodiscard]] uint32_t indexLayerCenterTile() const { return indexLayerCenterTile_; }
+  [[nodiscard]] size_t indexLayerCenterTile() const { return indexLayerCenterTile_; }
   /// @brief Behind bottom right tile row index accessor
   /// @return Behind bottom right tile row index
-  [[nodiscard]] uint32_t indexRowMaxTile() const { return indexRowMaxTile_; }
+  [[nodiscard]] size_t indexRowMaxTile() const { return indexRowMaxTile_; }
   /// @brief Behind bottom right tile column index accessor
   /// @return Behind bottom right tile column index
-  [[nodiscard]] uint32_t indexColMaxTile() const { return indexColMaxTile_; }
+  [[nodiscard]] size_t indexColMaxTile() const { return indexColMaxTile_; }
   /// @brief Behind bottom right tile layer index accessor
   /// @return Behind bottom right tile layer index
-  [[nodiscard]] uint32_t indexLayerMaxTile() const { return indexLayerMaxTile_; }
+  [[nodiscard]] size_t indexLayerMaxTile() const { return indexLayerMaxTile_; }
   /// @brief Corresponding file's row to top view's row accessor
   /// @return Corresponding file's row to top view's row
-  [[nodiscard]] uint32_t minRowFile() const { return minRowFile_; }
+  [[nodiscard]] size_t minRowFile() const { return minRowFile_; }
   /// @brief Corresponding file's row to bottom view's row accessor
   /// @return Corresponding file's row to bottom view's row
-  [[nodiscard]] uint32_t maxRowFile() const { return maxRowFile_; }
+  [[nodiscard]] size_t maxRowFile() const { return maxRowFile_; }
   /// @brief Corresponding file's column to left view's column accessor
   /// @return Corresponding file's column to left view's column
-  [[nodiscard]] uint32_t minColFile() const { return minColFile_; }
+  [[nodiscard]] size_t minColFile() const { return minColFile_; }
   /// @brief Corresponding file's column to right view's column accessor
   /// @return Corresponding file's column to right view's column
-  [[nodiscard]] uint32_t maxColFile() const { return maxColFile_; }
+  [[nodiscard]] size_t maxColFile() const { return maxColFile_; }
   /// @brief Corresponding file's layer to front view's row accessor
   /// @return Corresponding file's layer to front view's row
-  [[nodiscard]] uint32_t minLayerFile() const { return minLayerFile_; }
+  [[nodiscard]] size_t minLayerFile() const { return minLayerFile_; }
   /// @brief Corresponding file's layer to behind view's row accessor
   /// @return Corresponding file's layer to behind view's row
-  [[nodiscard]] uint32_t maxLayerFile() const { return maxLayerFile_; }
+  [[nodiscard]] size_t maxLayerFile() const { return maxLayerFile_; }
   /// @brief Number of rows on top to fill with ghost values accessor
   /// @return Number of rows on top to fill with ghost values
-  [[nodiscard]] uint32_t topFill() const { return topFill_; }
+  [[nodiscard]] size_t topFill() const { return topFill_; }
   /// @brief Number of columns on left to fill with ghost values accessor
   /// @return Number of columns on left to fill with ghost values
-  [[nodiscard]] uint32_t leftFill() const { return leftFill_; }
+  [[nodiscard]] size_t leftFill() const { return leftFill_; }
   /// @brief Number of layer on front to fill with ghost values accessor
   /// @return Number of layer on front to fill with ghost values
-  [[nodiscard]] uint32_t frontFill() const { return frontFill_; }
+  [[nodiscard]] size_t frontFill() const { return frontFill_; }
   /// @brief Number of rows on bottom to fill with ghost values accessor
   /// @return Number of rows on bottom to fill with ghost values
-  [[nodiscard]] uint32_t bottomFill() const { return bottomFill_; }
+  [[nodiscard]] size_t bottomFill() const { return bottomFill_; }
   /// @brief Number of columns on right to fill with ghost values accessor
   /// @return Number of columns on right to fill with ghost values
-  [[nodiscard]] uint32_t rightFill() const { return rightFill_; }
+  [[nodiscard]] size_t rightFill() const { return rightFill_; }
   /// @brief Number of layer on back to fill with ghost values accessor
   /// @return Number of layer on back to fill with ghost values
-  [[nodiscard]] uint32_t backFill() const { return backFill_; }
+  [[nodiscard]] size_t backFill() const { return backFill_; }
   /// @brief Type of filling used to generate the view accessor
   /// @return Type of filling used to generate the view
   [[nodiscard]] FillingType fillingType() const { return fillingType_; }
 
   /// @brief Number of tiles to load setter
   /// @param numberTilesToLoad Number of tiles to load to set
-  void numberTilesToLoad(uint32_t numberTilesToLoad) { numberTilesToLoad_ = numberTilesToLoad; }
+  void numberTilesToLoad(size_t numberTilesToLoad) { numberTilesToLoad_ = numberTilesToLoad; }
 
   /// @brief Return the memory (ViewData) to the memory manager
   virtual void returnToMemoryManager() = 0;

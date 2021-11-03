@@ -55,7 +55,7 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   std::vector<std::shared_ptr<internal::Cache < DataType>>>
   physicalTileCache_{}; ///< Cache used to store physical tile
 
-  std::vector<uint32_t>
+  std::vector<size_t>
       tileHeightRequestedPerLevel_{},   ///< Logical requested tile Height
       tileWidthRequestedPerLevel_{},    ///< Logical requested tile Width
       tileDepthRequestedPerLevel_{},    ///< Logical requested tile Depth
@@ -71,10 +71,10 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   /// @param numberTilesCachePerLevel Number of tiles to cache per pyramidal level
   AbstractAdaptiveTileLoader(std::string_view const &name,
                              std::string const &filePath,
-                             std::vector<uint32_t> const &tileHeightRequestedPerLevel,
-                             std::vector<uint32_t> const &tileWidthRequestedPerLevel,
-                             std::vector<uint32_t> const &tileDepthRequestedPerLevel,
-                             std::vector<uint32_t> const &numberTilesCachePerLevel = {})
+                             std::vector<size_t> const &tileHeightRequestedPerLevel,
+                             std::vector<size_t> const &tileWidthRequestedPerLevel,
+                             std::vector<size_t> const &tileDepthRequestedPerLevel,
+                             std::vector<size_t> const &numberTilesCachePerLevel = {})
       : AbstractTileLoader<ViewType>(name, filePath),
         tileHeightRequestedPerLevel_(tileHeightRequestedPerLevel),
         tileWidthRequestedPerLevel_(tileWidthRequestedPerLevel),
@@ -92,10 +92,10 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   AbstractAdaptiveTileLoader(std::string_view const &name,
                              size_t numberThreads,
                              std::string const &filePath,
-                             std::vector<uint32_t> const &tileHeightRequestedPerLevel,
-                             std::vector<uint32_t> const &tileWidthRequestedPerLevel,
-                             std::vector<uint32_t> const &tileDepthRequestedPerLevel,
-                             std::vector<uint32_t> const &numberTilesCachePerLevel = {})
+                             std::vector<size_t> const &tileHeightRequestedPerLevel,
+                             std::vector<size_t> const &tileWidthRequestedPerLevel,
+                             std::vector<size_t> const &tileDepthRequestedPerLevel,
+                             std::vector<size_t> const &numberTilesCachePerLevel = {})
       : AbstractTileLoader<ViewType>(name, numberThreads, filePath),
         tileHeightRequestedPerLevel_(tileHeightRequestedPerLevel),
         tileWidthRequestedPerLevel_(tileWidthRequestedPerLevel),
@@ -110,40 +110,40 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
 
   /// @brief Logical requested tile height for all levels
   /// @return Vector containing all logical requested tile height
-  [[nodiscard]] std::vector<uint32_t> const &tileHeightRequestedPerLevel() const {
+  [[nodiscard]] std::vector<size_t> const &tileHeightRequestedPerLevel() const {
     return tileHeightRequestedPerLevel_;
   }
   /// @brief Logical requested tile width for all levels
   /// @return Vector containing all logical requested tile width
-  [[nodiscard]] std::vector<uint32_t> const &tileWidthRequestedPerLevel() const {
+  [[nodiscard]] std::vector<size_t> const &tileWidthRequestedPerLevel() const {
     return tileWidthRequestedPerLevel_;
   }
   /// @brief Logical requested tile depth for all levels
   /// @return Vector containing all logical requested tile depth
-  [[nodiscard]] std::vector<uint32_t> const &tileDepthRequestedPerLevel() const {
+  [[nodiscard]] std::vector<size_t> const &tileDepthRequestedPerLevel() const {
     return tileDepthRequestedPerLevel_;
   }
 
   /// @brief Number of physical tiles to cache for all levels
   /// @return Vector containing all number of physical tiles to cache for all levels
-  [[nodiscard]] std::vector<uint32_t> const &numberTilesCachePerLevel() const {
+  [[nodiscard]] std::vector<size_t> const &numberTilesCachePerLevel() const {
     return numberTilesCachePerLevel_;
   }
 
   /// @brief Physical tile width accessor for a level
   /// @param level Pyramidal level
   /// @return Physical tile width for a level
-  [[nodiscard]] virtual uint32_t physicalTileWidth(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t physicalTileWidth(size_t level) const = 0;
 
   /// @brief Physical tile height accessor for a level
   /// @param level Pyramidal level
   /// @return Physical tile height for a level
-  [[nodiscard]] virtual uint32_t physicalTileHeight(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t physicalTileHeight(size_t level) const = 0;
 
   /// @brief Physical tile depth accessor for a level
   /// @param level Pyramidal level
   /// @return Physical tile depth for a level
-  [[nodiscard]] virtual uint32_t physicalTileDepth(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t physicalTileDepth(size_t level) const = 0;
 
   /// @brief Load a physical tile from a file
   /// @param physicalTile Piece of memory to fill
@@ -153,10 +153,10 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   /// @param fileLevel Pyramidal level
   virtual void loadPhysicalTileFromFile(
       std::shared_ptr<std::vector<DataType>> physicalTile,
-      uint32_t indexFileRowGlobalTile,
-      uint32_t indexFileColGlobalTile,
-      uint32_t indexFileLayerGlobalTile,
-      uint32_t fileLevel
+      size_t indexFileRowGlobalTile,
+      size_t indexFileColGlobalTile,
+      size_t indexFileLayerGlobalTile,
+      size_t fileLevel
   ) = 0;
 
   /// @brief From a logical tile request, request n physical tiles, copy needed data
@@ -166,11 +166,11 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   /// @param indexLayerGlobalTile Logical index layer to fill
   /// @param level Logical pyramidal level
   void loadTileFromFile(std::shared_ptr<std::vector<DataType>> logicalTile,
-                        uint32_t indexRowGlobalTile,
-                        uint32_t indexColGlobalTile,
-                        uint32_t indexLayerGlobalTile,
-                        uint32_t level) final {
-    uint32_t const
+                        size_t indexRowGlobalTile,
+                        size_t indexColGlobalTile,
+                        size_t indexLayerGlobalTile,
+                        size_t level) final {
+    size_t const
         logicalTileWidth = tileWidth(level),
         logicalTileHeight = tileHeight(level),
         logicalTileDepth = tileDepth(level),
@@ -184,9 +184,9 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
         maxColumn = std::min((indexColGlobalTile + 1) * logicalTileWidth, this->fullWidth(level)),
         maxLayer = std::min((indexLayerGlobalTile + 1) * logicalTileDepth, this->fullDepth(level)),
 
-        numberPhysicalTilesRow = (uint32_t) ceil((double) (this->fullHeight(level)) / physicalTileHeight),
-        numberPhysicalTilesCol = (uint32_t) ceil((double) (this->fullWidth(level)) / physicalTileWidth),
-        numberPhysicalTilesLayer = (uint32_t) ceil((double) (this->fullDepth(level)) / physicalTileDepth),
+        numberPhysicalTilesRow = (size_t) ceil((double) (this->fullHeight(level)) / physicalTileHeight),
+        numberPhysicalTilesCol = (size_t) ceil((double) (this->fullWidth(level)) / physicalTileWidth),
+        numberPhysicalTilesLayer = (size_t) ceil((double) (this->fullDepth(level)) / physicalTileDepth),
 
         indexMinPhysicalRow = minRow / physicalTileHeight,
         indexMinPhysicalColumn = minColumn / physicalTileWidth,
@@ -195,7 +195,7 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
         indexMaxPhysicalColumn = std::min((maxColumn / physicalTileWidth) + 1, numberPhysicalTilesCol),
         indexMaxPhysicalLayer = std::min((maxLayer / physicalTileDepth) + 1, numberPhysicalTilesLayer);
 
-    uint32_t
+    size_t
         startRowCopy = 0,
         startColCopy = 0,
         startLayerCopy = 0,
@@ -208,28 +208,28 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
         deltaLogicalRow = 0;
 
     for (size_t indexLayer = indexMinPhysicalLayer; indexLayer < indexMaxPhysicalLayer; ++indexLayer) {
-      startLayerCopy = std::max(uint32_t(indexLayer * physicalTileDepth), minLayer);
-      endLayerCopy = std::min(uint32_t((indexLayer + 1) * physicalTileDepth), maxLayer);
+      startLayerCopy = std::max(size_t(indexLayer * physicalTileDepth), minLayer);
+      endLayerCopy = std::min(size_t((indexLayer + 1) * physicalTileDepth), maxLayer);
 
-      for (uint32_t layerCopy = startLayerCopy; layerCopy < endLayerCopy; ++layerCopy) {
+      for (size_t layerCopy = startLayerCopy; layerCopy < endLayerCopy; ++layerCopy) {
         deltaPhysicalLayer =
             (layerCopy - (indexLayer * physicalTileDepth)) * physicalTileWidth * physicalTileHeight;
         deltaLogicalLayer =
             (layerCopy - ((layerCopy / logicalTileDepth) * logicalTileDepth)) * logicalTileWidth * logicalTileHeight;
 
         for (size_t indexRow = indexMinPhysicalRow; indexRow < indexMaxPhysicalRow; ++indexRow) {
-          startRowCopy = std::max(uint32_t(indexRow * physicalTileHeight), minRow);
-          endRowCopy = std::min(uint32_t((indexRow + 1) * physicalTileHeight), maxRow);
+          startRowCopy = std::max(size_t(indexRow * physicalTileHeight), minRow);
+          endRowCopy = std::min(size_t((indexRow + 1) * physicalTileHeight), maxRow);
 
-          for (uint32_t rowCopy = startRowCopy; rowCopy < endRowCopy; ++rowCopy) {
+          for (size_t rowCopy = startRowCopy; rowCopy < endRowCopy; ++rowCopy) {
             deltaPhysicalRow =
                 (rowCopy - (indexRow * physicalTileHeight)) * physicalTileWidth;
             deltaLogicalRow =
                 (rowCopy - ((rowCopy / logicalTileHeight) * logicalTileHeight)) * logicalTileWidth;
 
             for (size_t indexColumn = indexMinPhysicalColumn; indexColumn < indexMaxPhysicalColumn; ++indexColumn) {
-              startColCopy = std::max(uint32_t(indexColumn * physicalTileWidth), minColumn);
-              endColCopy = std::min(uint32_t((indexColumn + 1) * physicalTileWidth), maxColumn);
+              startColCopy = std::max(size_t(indexColumn * physicalTileWidth), minColumn);
+              endColCopy = std::min(size_t((indexColumn + 1) * physicalTileWidth), maxColumn);
 
               auto cachedTile = physicalTileCache_.at(level)->lockedTile(indexRow, indexColumn, indexLayer);
               auto physicalTile = cachedTile->data();
@@ -263,19 +263,19 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   /// @brief Logical tile width accessor
   /// @param level Pyramidal level
   /// @return Logical tile width
-  [[nodiscard]] uint32_t tileWidth(uint32_t level) const final {
+  [[nodiscard]] size_t tileWidth(size_t level) const final {
     return tileWidthRequestedPerLevel_.at(level);
   }
   /// @brief Logical tile height accessor
   /// @param level Pyramidal level
   /// @return Logical tile height
-  [[nodiscard]] uint32_t tileHeight(uint32_t level) const final {
+  [[nodiscard]] size_t tileHeight(size_t level) const final {
     return tileHeightRequestedPerLevel_.at(level);
   }
   /// @brief Logical tile depth accessor
   /// @param level Pyramidal level
   /// @return Logical tile depth
-  [[nodiscard]] uint32_t tileDepth(uint32_t level) const final {
+  [[nodiscard]] size_t tileDepth(size_t level) const final {
     return tileDepthRequestedPerLevel_.at(level);
   }
 
@@ -292,15 +292,15 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
     }
     auto validateHeight = std::all_of(
         tileHeightRequestedPerLevel_.cbegin(), tileHeightRequestedPerLevel_.cend(),
-        [](uint32_t const &height) { return height > 0; });
+        [](size_t const &height) { return height > 0; });
     auto validateWidth = std::all_of(
         tileWidthRequestedPerLevel_.cbegin(), tileWidthRequestedPerLevel_.cend(),
-        [](uint32_t const &width) { return width > 0; });
+        [](size_t const &width) { return width > 0; });
     auto validateDepth = std::all_of(
         tileDepthRequestedPerLevel_.cbegin(), tileDepthRequestedPerLevel_.cend(),
-        [](uint32_t const &depth) { return depth > 0; });
+        [](size_t const &depth) { return depth > 0; });
 
-    for (uint32_t level = 0; level < this->numberPyramidLevels(); ++level) {
+    for (size_t level = 0; level < this->numberPyramidLevels(); ++level) {
       validateHeight &= tileHeightRequestedPerLevel_.at(level) <= this->fullHeight(level);
       validateWidth &= tileWidthRequestedPerLevel_.at(level) <= this->fullWidth(level);
       validateHeight &= tileDepthRequestedPerLevel_.at(level) <= this->fullDepth(level);
@@ -312,14 +312,14 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
     }
 
     if (numberTilesCachePerLevel_.empty()) {
-      numberTilesCachePerLevel_ = std::vector<uint32_t>(this->numberPyramidLevels(), 1);
-      for (uint32_t level = 0; level < this->numberPyramidLevels(); ++level) {
+      numberTilesCachePerLevel_ = std::vector<size_t>(this->numberPyramidLevels(), 1);
+      for (size_t level = 0; level < this->numberPyramidLevels(); ++level) {
         this->physicalTileCache_.push_back(
             std::make_shared<internal::Cache<DataType>>(
                 1,
-                (uint32_t) ceil((double) (this->fullHeight(level)) / physicalTileHeight(level)),
-                (uint32_t) ceil((double) (this->fullWidth(level)) / physicalTileWidth(level)),
-                (uint32_t) ceil((double) (this->fullDepth(level)) / physicalTileDepth(level)),
+                (size_t) ceil((double) (this->fullHeight(level)) / physicalTileHeight(level)),
+                (size_t) ceil((double) (this->fullWidth(level)) / physicalTileWidth(level)),
+                (size_t) ceil((double) (this->fullDepth(level)) / physicalTileDepth(level)),
                 physicalTileHeight(level),
                 physicalTileWidth(level),
                 physicalTileDepth(level),
@@ -330,19 +330,19 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
     } else {
       auto validateCache = std::all_of(
           numberTilesCachePerLevel_.cbegin(), numberTilesCachePerLevel_.cend(),
-          [](uint32_t const &numberTilesCache) { return numberTilesCache > 0; });
+          [](size_t const &numberTilesCache) { return numberTilesCache > 0; });
       if (validateCache) {
         std::copy_n(
             numberTilesCachePerLevel_.cbegin(),
             this->numberPyramidLevels(),
             std::back_inserter(numberTilesCachePerLevel_));
-        for (uint32_t level = 0; level < this->numberPyramidLevels(); ++level) {
+        for (size_t level = 0; level < this->numberPyramidLevels(); ++level) {
           this->physicalTileCache_.push_back(
               std::make_shared<internal::Cache<DataType>>(
                   numberTilesCachePerLevel_.at(level),
-                  (uint32_t) ceil((double) (this->fullHeight(level)) / physicalTileHeight(level)),
-                  (uint32_t) ceil((double) (this->fullWidth(level)) / physicalTileWidth(level)),
-                  (uint32_t) ceil((double) (this->fullDepth(level)) / physicalTileDepth(level)),
+                  (size_t) ceil((double) (this->fullHeight(level)) / physicalTileHeight(level)),
+                  (size_t) ceil((double) (this->fullWidth(level)) / physicalTileWidth(level)),
+                  (size_t) ceil((double) (this->fullDepth(level)) / physicalTileDepth(level)),
                   physicalTileHeight(level),
                   physicalTileWidth(level),
                   physicalTileDepth(level),

@@ -60,7 +60,7 @@ class ReflectBorderCreator : public AbstractBorderCreator<ViewType> {
   const &view) override {
     std::list<std::shared_ptr<TileRequest < ViewType>> > tileRequests;
 
-    uint32_t
+    size_t
         tileWidth = view->viewData()->tileWidth(),
         tileHeight = view->viewData()->tileHeight(),
         viewWidth = view->viewData()->viewWidth(),
@@ -160,7 +160,7 @@ class ReflectBorderCreator : public AbstractBorderCreator<ViewType> {
       ++deltaIndex;
     }
 
-    for (uint32_t r = view->viewData()->indexRowMinTile(); r < view->viewData()->indexRowMaxTile(); ++r) {
+    for (size_t r = view->viewData()->indexRowMinTile(); r < view->viewData()->indexRowMaxTile(); ++r) {
       ulTileRowGlobal = r * tileHeight;
       rowFrom = ulTileRowGlobal <= minRowFile ? (minRowFile - ulTileRowGlobal) : 0;
       heightToCopy = std::min(maxRowFile, ulTileRowGlobal + tileHeight) - rowFrom - ulTileRowGlobal;
@@ -193,7 +193,7 @@ class ReflectBorderCreator : public AbstractBorderCreator<ViewType> {
       rowAlreadyFilled += heightToCopy;
     }
 
-    for (uint32_t c = view->viewData()->indexColMinTile(); c < view->viewData()->indexColMaxTile(); ++c) {
+    for (size_t c = view->viewData()->indexColMinTile(); c < view->viewData()->indexColMaxTile(); ++c) {
       ulTileColGlobal = c * tileWidth;
       colFrom = ulTileColGlobal <= minColFile ? (minColFile - ulTileColGlobal) : 0;
       widthToCopy = std::min(maxColFile, ulTileColGlobal + tileWidth) - colFrom - ulTileColGlobal;

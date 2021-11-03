@@ -47,7 +47,7 @@ std::shared_ptr<AbstractBorderCreator < ViewType>>
 borderCreator_ {
 }; ///< Border creator to fill ghost pixels
 
-std::shared_ptr<std::unordered_map<std::shared_ptr<ViewType>, uint32_t>>
+std::shared_ptr<std::unordered_map<std::shared_ptr<ViewType>, size_t>>
     countMap_{};  ///< Map between the view, and the number of tiles loaded
 
 std::shared_ptr<std::list<std::shared_ptr<ViewType>>>
@@ -73,7 +73,7 @@ bool ordered
 : hh::AbstractTask<ViewType, TileRequest < ViewType>>("AbstractView Counter"),
 
 borderCreator_ (borderCreator), ordered_(ordered) {
-  countMap_ = std::make_shared<std::unordered_map<std::shared_ptr<ViewType>, uint32_t>>();
+  countMap_ = std::make_shared<std::unordered_map<std::shared_ptr<ViewType>, size_t>>();
   waitingList_ = std::make_shared<std::list<std::shared_ptr<ViewType>>>();
   indexRequests_ = std::make_shared<std::queue<std::shared_ptr<IndexRequest>>>();
 }
@@ -128,7 +128,7 @@ friend std::ostream &operator<<(std::ostream &os, ViewCounter &vc) {
   os << "BorderCreator: " << vc.borderCreator_ << std::endl;
   os << "Ordered: " << std::boolalpha << vc.ordered_ << std::endl;
   os << "CountMap: " << std::endl;
-  for (std::pair<std::shared_ptr<ViewType>, uint32_t> const &count : *(vc.countMap_)) {
+  for (std::pair<std::shared_ptr<ViewType>, size_t> const &count : *(vc.countMap_)) {
     os << "\t" << count.first << ": " << count.second << std::endl;
   }
   os << "Waiting List: ";

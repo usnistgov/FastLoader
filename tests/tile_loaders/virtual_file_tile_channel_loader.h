@@ -70,10 +70,10 @@ class VirtualFileTileChannelLoader : public fl::AbstractTileLoader<fl::DefaultVi
   ~VirtualFileTileChannelLoader() override = default;
 
   void loadTileFromFile(std::shared_ptr<std::vector<int>> ptr,
-                        uint32_t indexRowGlobalTile,
-                        uint32_t indexColGlobalTile,
-                        uint32_t indexLayerGlobalTile,
-                        [[maybe_unused]] uint32_t level) override {
+                        size_t indexRowGlobalTile,
+                        size_t indexColGlobalTile,
+                        size_t indexLayerGlobalTile,
+                        [[maybe_unused]] size_t level) override {
     size_t
         startingLayer = indexLayerGlobalTile * tileDepth_,
         endLayer = std::min((size_t) ((indexLayerGlobalTile + 1) * tileDepth_), (size_t) fileDepth_),
@@ -109,17 +109,17 @@ class VirtualFileTileChannelLoader : public fl::AbstractTileLoader<fl::DefaultVi
     );
   }
 
-  [[nodiscard]] uint32_t fullHeight([[maybe_unused]] uint32_t level) const override { return fileHeight_; }
-  [[nodiscard]] uint32_t fullWidth([[maybe_unused]] uint32_t level) const override { return fileWidth_; }
-  [[nodiscard]] uint32_t fullDepth([[maybe_unused]] uint32_t level) const override { return fileDepth_; }
+  [[nodiscard]] size_t fullHeight([[maybe_unused]] size_t level) const override { return fileHeight_; }
+  [[nodiscard]] size_t fullWidth([[maybe_unused]] size_t level) const override { return fileWidth_; }
+  [[nodiscard]] size_t fullDepth([[maybe_unused]] size_t level) const override { return fileDepth_; }
 
-  [[nodiscard]] uint32_t tileWidth([[maybe_unused]] uint32_t level) const override { return tileWidth_; }
-  [[nodiscard]] uint32_t tileHeight([[maybe_unused]] uint32_t level) const override { return tileHeight_; }
-  [[nodiscard]] uint32_t tileDepth([[maybe_unused]] uint32_t level) const override { return tileDepth_; }
-  [[nodiscard]] uint32_t numberChannels() const override { return numberChannels_; }
+  [[nodiscard]] size_t tileWidth([[maybe_unused]] size_t level) const override { return tileWidth_; }
+  [[nodiscard]] size_t tileHeight([[maybe_unused]] size_t level) const override { return tileHeight_; }
+  [[nodiscard]] size_t tileDepth([[maybe_unused]] size_t level) const override { return tileDepth_; }
+  [[nodiscard]] size_t numberChannels() const override { return numberChannels_; }
 
   [[nodiscard]] short bitsPerSample() const override { return sizeof(int); }
-  [[nodiscard]] uint32_t numberPyramidLevels() const override { return 1; }
+  [[nodiscard]] size_t numberPyramidLevels() const override { return 1; }
 };
 
 #endif //INC_3DFASTLOADER_VIRTUAL_FILE_TILE_CHANNEL_LOADER_H

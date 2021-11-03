@@ -26,13 +26,13 @@
 #include <cmath>
 #include "../fast_loader/internal/cache.h"
 
-void cacheInitialization(uint32_t numTileCache,
-                         uint32_t numTilesHeight, uint32_t numTilesWidth, uint32_t numTilesDepth,
-                         uint32_t tileHeight, uint32_t tileWidth, uint32_t tileDepth, uint32_t numberChannels) {
+void cacheInitialization(size_t numTileCache,
+                         size_t numTilesHeight, size_t numTilesWidth, size_t numTilesDepth,
+                         size_t tileHeight, size_t tileWidth, size_t tileDepth, size_t numberChannels) {
   fl::internal::Cache<int> cache(
       numTileCache, numTilesHeight, numTilesWidth, numTilesDepth, tileHeight, tileWidth, tileDepth, numberChannels);
-  ASSERT_EQ(cache.hit(), (uint32_t) 0);
-  ASSERT_EQ(cache.miss(), (uint32_t) 0);
+  ASSERT_EQ(cache.hit(), (size_t) 0);
+  ASSERT_EQ(cache.miss(), (size_t) 0);
   if (numTileCache == 0) { numTileCache = 2 * numTilesWidth; }
   if (numTilesHeight * numTilesWidth * numTilesDepth < numTileCache) {
     ASSERT_EQ(cache.nbTilesCache(), numTilesHeight * numTilesWidth * numTilesDepth);
@@ -41,26 +41,26 @@ void cacheInitialization(uint32_t numTileCache,
   }
   ASSERT_EQ(cache.nbTilesCache(), cache.pool().size());
   auto const & mapCache = cache.mapCache();
-  for (uint32_t layer = 0; layer < numTilesDepth; ++layer) {
-    for (uint32_t row = 0; row < numTilesHeight; ++row) {
-      for (uint32_t col = 0; col < numTilesWidth; ++col) {
+  for (size_t layer = 0; layer < numTilesDepth; ++layer) {
+    for (size_t row = 0; row < numTilesHeight; ++row) {
+      for (size_t col = 0; col < numTilesWidth; ++col) {
         ASSERT_TRUE(mapCache.at(layer).at(row).at(col).get() == nullptr);
       }
     }
   }
-  ASSERT_EQ(cache.lru().size(), (uint32_t) 0);
+  ASSERT_EQ(cache.lru().size(), (size_t) 0);
 }
 
-void getNewTiles(uint32_t numTileCache,
-                 uint32_t numTilesHeight, uint32_t numTilesWidth, uint32_t numTilesDepth,
-                 uint32_t tileHeight, uint32_t tileWidth, uint32_t tileDepth, uint32_t numberChannels) {
+void getNewTiles(size_t numTileCache,
+                 size_t numTilesHeight, size_t numTilesWidth, size_t numTilesDepth,
+                 size_t tileHeight, size_t tileWidth, size_t tileDepth, size_t numberChannels) {
   std::shared_ptr<fl::internal::CachedTile<int>> tile = nullptr;
   fl::internal::Cache<int> cache(
       numTileCache,
       numTilesHeight, numTilesWidth, numTilesDepth,
       tileHeight, tileWidth, tileDepth, numberChannels);
 
-  uint32_t
+  size_t
       nbTilesCache = cache.nbTilesCache();
 
   ASSERT_THROW(cache.lockedTile(numTilesHeight + 1, 0, 0), std::runtime_error);
@@ -92,12 +92,12 @@ void getNewTiles(uint32_t numTileCache,
   ASSERT_EQ(cache.lru().front().get(),
             (cache.mapCache().at(numTilesDepth - 1).at(numTilesHeight - 1).at(numTilesWidth - 1).get()));
 
-  uint32_t
+  size_t
       twoDGridSize = numTilesWidth * numTilesHeight,
       indexLayer = 0,
       indexRow = 0,
       indexColumn = 0;
-  for (uint32_t alreadyUsedTiles = 1; alreadyUsedTiles < nbTilesCache; ++alreadyUsedTiles) {
+  for (size_t alreadyUsedTiles = 1; alreadyUsedTiles < nbTilesCache; ++alreadyUsedTiles) {
     indexLayer = alreadyUsedTiles / twoDGridSize;
     indexRow = (alreadyUsedTiles % twoDGridSize) / numTilesWidth;
     indexColumn = (alreadyUsedTiles % twoDGridSize) % numTilesWidth;

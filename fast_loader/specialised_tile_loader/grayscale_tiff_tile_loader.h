@@ -40,7 +40,7 @@ template<class DataType>
   TIFF *
       tiff_ = nullptr;             ///< Tiff file pointer
 
-  uint32_t
+  size_t
       fullHeight_ = 0,           ///< Full height in pixel
       fullWidth_ = 0,            ///< Full width in pixel
       tileHeight_ = 0,            ///< Tile height
@@ -96,8 +96,8 @@ template<class DataType>
   /// @param indexColGlobalTile Tile column index
   /// @param level Tile's level
   void loadTileFromFile(std::shared_ptr<std::vector<DataType>> tile,
-                        uint32_t indexRowGlobalTile, uint32_t indexColGlobalTile, [[maybe_unused]] uint32_t indexLayerGlobalTile,
-                        [[maybe_unused]] uint32_t level) override {
+                        size_t indexRowGlobalTile, size_t indexColGlobalTile, [[maybe_unused]] size_t indexLayerGlobalTile,
+                        [[maybe_unused]] size_t level) override {
     tdata_t tiffTile = nullptr;
     tiffTile = _TIFFmalloc(TIFFTileSize(tiff_));
     TIFFReadTile(tiff_, tiffTile, indexColGlobalTile * tileWidth_, indexRowGlobalTile * tileHeight_, 0, 0);
@@ -109,7 +109,7 @@ template<class DataType>
             break;
           case 16:loadTile<uint16_t>(tiffTile, tile);
             break;
-          case 32:loadTile<uint32_t>(tiffTile, tile);
+          case 32:loadTile<size_t>(tiffTile, tile);
             break;
           case 64:loadTile<uint64_t>(tiffTile, tile);
             break;
@@ -170,25 +170,25 @@ template<class DataType>
   /// @brief Tiff file height
   /// @param level Tiff level [not used]
   /// @return Full height
-  [[nodiscard]] uint32_t fullHeight([[maybe_unused]] uint32_t level) const override { return fullHeight_; }
+  [[nodiscard]] size_t fullHeight([[maybe_unused]] size_t level) const override { return fullHeight_; }
   /// @brief Tiff full width
   /// @param level Tiff level [not used]
   /// @return Full width
-  [[nodiscard]] uint32_t fullWidth([[maybe_unused]] uint32_t level) const override { return fullWidth_; }
+  [[nodiscard]] size_t fullWidth([[maybe_unused]] size_t level) const override { return fullWidth_; }
   /// @brief Tiff tile width
   /// @param level Tiff level [not used]
   /// @return Tile width
-  [[nodiscard]] uint32_t tileWidth([[maybe_unused]] uint32_t level) const override { return tileWidth_; }
+  [[nodiscard]] size_t tileWidth([[maybe_unused]] size_t level) const override { return tileWidth_; }
   /// @brief Tiff tile height
   /// @param level Tiff level [not used]
   /// @return Tile height
-  [[nodiscard]] uint32_t tileHeight([[maybe_unused]] uint32_t level) const override { return tileHeight_; }
+  [[nodiscard]] size_t tileHeight([[maybe_unused]] size_t level) const override { return tileHeight_; }
   /// @brief Tiff bits per sample
   /// @return Size of a sample in bits
   [[nodiscard]] short bitsPerSample() const override { return bitsPerSample_; }
   /// @brief Level accessor
   /// @return 1
-  [[nodiscard]] uint32_t numberPyramidLevels() const override { return 1; }
+  [[nodiscard]] size_t numberPyramidLevels() const override { return 1; }
 
  private:
   /// @brief Private function to copy and cast the values
@@ -197,7 +197,7 @@ template<class DataType>
   /// @param dest Piece of memory to fill
   template<typename FileType>
   void loadTile(tdata_t src, std::shared_ptr<std::vector<DataType>> &dest) {
-    for (uint32_t i = 0; i < tileHeight_ * tileWidth_; ++i) { dest->data()[i] = (DataType) ((FileType *) (src))[i]; }
+    for (size_t i = 0; i < tileHeight_ * tileWidth_; ++i) { dest->data()[i] = (DataType) ((FileType *) (src))[i]; }
   }
 
 };

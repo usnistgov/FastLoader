@@ -69,7 +69,7 @@ checkCudaErrors(cudaMallocManaged((void **) &this->data_, sizeof(DataType) * vie
   /// @brief Constructor from the size of the view and the number of releases
   /// @param viewSize Size of the view (number of elements)
   /// @param numberOfRelease Number of releases for a view
-  UnifiedViewData(uint32_t viewSize, uint32_t numberOfRelease) : AbstractViewData<DataType>(numberOfRelease),
+  UnifiedViewData(size_t viewSize, size_t numberOfRelease) : AbstractViewData<DataType>(numberOfRelease),
       viewSize_(viewSize) {
     checkCudaErrors(cudaMallocManaged((void **) &this->data_, sizeof(DataType) * viewSize));
   }
@@ -78,7 +78,7 @@ checkCudaErrors(cudaMallocManaged((void **) &this->data_, sizeof(DataType) * vie
   /// @param sizesPerLevel Sizes of the view (number of elements) for all the pyramid's level
   /// @param releasesPerLevel Number of releases for a view for all the pyramid's level
   /// @param level Level of the pyramid
-  UnifiedViewData(std::vector<uint32_t> sizesPerLevel, std::vector<uint32_t> releasesPerLevel, uint32_t level) :
+  UnifiedViewData(std::vector<size_t> sizesPerLevel, std::vector<size_t> releasesPerLevel, size_t level) :
       UnifiedViewData(sizesPerLevel[level], releasesPerLevel[level]) {}
 
   /// @brief DefaultViewData destructor, will destroy created events and cudaFree raw array

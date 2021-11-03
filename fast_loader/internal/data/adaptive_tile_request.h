@@ -54,9 +54,9 @@ class AdaptiveTileRequest : public TileRequest<ViewType> {
       needCopyFromPhysicalTileLoader_(false) {}
 
   // Constructor used if logical tile is not already cached
-  AdaptiveTileRequest(uint32_t indexRowTileAsked,
-                      uint32_t indexColTileAsked,
-                      uint32_t indexLayerTileAsked,
+  AdaptiveTileRequest(size_t indexRowTileAsked,
+                      size_t indexColTileAsked,
+                      size_t indexLayerTileAsked,
                       std::shared_ptr<fl::internal::AdaptiveView<ViewType>> adaptiveView,
                       std::shared_ptr<TileRequest<ViewType>> const &logicalTileRequest,
                       std::shared_ptr<fl::internal::CachedTile<DataType>> const &logicalCachedTile) :

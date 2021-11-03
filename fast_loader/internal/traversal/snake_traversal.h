@@ -38,11 +38,11 @@
 //  virtual ~SnakeTraversal() = default;
 //
 // private:
-//  [[nodiscard]] std::vector<std::pair<uint32_t, uint32_t>> traversal(uint32_t level) const override {
-//    std::vector<std::pair<uint32_t, uint32_t>> traversal;
-//    for (uint32_t row = 0; row < this->numberTileHeight(level); ++row) {
+//  [[nodiscard]] std::vector<std::pair<size_t, size_t>> traversal(size_t level) const override {
+//    std::vector<std::pair<size_t, size_t>> traversal;
+//    for (size_t row = 0; row < this->numberTileHeight(level); ++row) {
 //      if (row % 2 == 0) {
-//        for (uint32_t col = 0; col < this->numberTileWidth(level); ++col) { traversal.emplace_back(row, col); }
+//        for (size_t col = 0; col < this->numberTileWidth(level); ++col) { traversal.emplace_back(row, col); }
 //      } else {
 //        for (int32_t col = this->numberTileWidth(level) - 1; col > -1; --col) { traversal.emplace_back(row, col); }
 //      }

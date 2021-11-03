@@ -12,12 +12,12 @@
 #include "test_radius.h"
 
 TEST(TEST_3DFL, TEST_CACHE) {
-  std::vector<uint32_t>
+  std::vector<size_t>
       numbersTilesToCache{0, 1, 10, 100},
       numbersTiles{5, 10};
 
   std::random_device rd;
-  std::uniform_int_distribution<uint32_t> distribution(1, 20);
+  std::uniform_int_distribution<size_t> distribution(1, 20);
 
   for (auto numberTilesToCache : numbersTilesToCache) {
     for (auto numTilesHeight : numbersTiles) {

@@ -28,7 +28,7 @@ namespace fl {
 /// @brief FastLoader internal namespace
 /// @brief Data structure to represent a requested index, used for ordering
 struct IndexRequest {
-  uint32_t
+  size_t
       indexRow_, ///< Row index
       indexCol_, ///< Column index
       indexLayer_, ///< Layer index
@@ -39,7 +39,7 @@ struct IndexRequest {
   /// @param indexCol Index request's column
   /// @param indexLayer Index request's layer
   /// @param level Index request's level
-  IndexRequest(uint32_t indexRow, uint32_t indexCol, uint32_t indexLayer, uint32_t level)
+  IndexRequest(size_t indexRow, size_t indexCol, size_t indexLayer, size_t level)
       : indexRow_(indexRow), indexCol_(indexCol), indexLayer_(indexLayer), level_(level) {}
 
   /// @brief Index request output stream operator

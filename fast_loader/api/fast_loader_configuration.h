@@ -54,8 +54,8 @@ class FastLoaderGraph;
 /// @details
 /// Requires a TileLoader in order to be constructed, which will be used by the FastLoaderGraph to load tiles from a file.
 /// Define the following configuration for the FastLoaderGraph:
-/// - Define the view radii [default 0]: radius(uint32_t radius) for the same radius in every dimension or radius(uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth)
-/// - Define the number of views available to be used at the same time [default 1]: viewAvailable(uint32_t level, uint32_t numberViewAvailable)
+/// - Define the view radii [default 0]: radius(size_t radius) for the same radius in every dimension or radius(size_t radiusHeight, size_t radiusWidth, size_t radiusDepth)
+/// - Define the number of views available to be used at the same time [default 1]: viewAvailable(size_t level, size_t numberViewAvailable)
 /// - Define the borderCreator to fill the view's ghost region [default ConstantBorderCreator]:
 ///   - borderCreator(FillingType fillingType) or,
 ///   - borderCreatorConstant(typename ViewType::data_t constantValue) or,
@@ -63,8 +63,8 @@ class FastLoaderGraph;
 /// - Define the traversal used when all views are requested [default SNAKE]: traversalType(TraversalType traversalType)
 /// - Define if the view are returned in the same order they have been requested [default false]: void ordered(bool ordered)
 /// - Define the number of time a view should return into the graph before being discarded and be available to a new
-/// request  [default 1]: releaseCount(uint32_t level, uint32_t release)
-/// - Define the TileLoader Cache capacity [default 1]: cacheCapacity(uint32_t level, uint32_t capacity)
+/// request  [default 1]: releaseCount(size_t level, size_t release)
+/// - Define the TileLoader Cache capacity [default 1]: cacheCapacity(size_t level, size_t capacity)
 /// @attention To define ViewType, ViewType has to inherit publicly from AbstractView, the data inside of the view has to be
 /// trivial.
 /// @tparam ViewType AbstractView type
@@ -82,7 +82,7 @@ class FastLoaderConfiguration {
   static_assert(internal::traits::is_view_v<ViewType>,
                 "The given type should inherit from view (DefaultView or UnifiedView if available).");
 
-  std::vector<uint32_t>
+  std::vector<size_t>
       nbReleasePyramid_,        ///< the number of time a view should return into the graph before being discarded and
   ///< be available to a new request
   cacheCapacity_,           ///< TileLoader Cache capacity
@@ -106,7 +106,7 @@ class FastLoaderConfiguration {
   bool
       ordered_; ///< Flag to define if the view are returned in the same order they have been requested
 
-  uint32_t
+  size_t
       levels_, ///< File level (pyramidal, etc.)
   radiusHeight_, ///< AbstractView's height radius
   radiusWidth_, ///< AbstractView's width radius
@@ -119,9 +119,9 @@ class FastLoaderConfiguration {
   : tileLoader_(tileLoader) {
     // Test the validity of the tileLoader
     validateTileLoader();
-    nbReleasePyramid_ = std::vector<uint32_t>(tileLoader->numberPyramidLevels(), 1);
-    cacheCapacity_ = std::vector<uint32_t>(tileLoader->numberPyramidLevels(), 1);
-    viewAvailablePerLevel_ = std::vector<uint32_t>(tileLoader->numberPyramidLevels(), 1);
+    nbReleasePyramid_ = std::vector<size_t>(tileLoader->numberPyramidLevels(), 1);
+    cacheCapacity_ = std::vector<size_t>(tileLoader->numberPyramidLevels(), 1);
+    viewAvailablePerLevel_ = std::vector<size_t>(tileLoader->numberPyramidLevels(), 1);
     fillingType_ = FillingType::CONSTANT;
     borderCreator_ =
         std::make_shared<internal::ConstantBorderCreator<ViewType>>(typename ViewType::data_t());
@@ -136,13 +136,13 @@ class FastLoaderConfiguration {
 
   /// @brief Change the shared radius for every direction
   /// @param sharedRadius New shared radius for every direction
-  void radius(uint32_t sharedRadius) { radius(sharedRadius, sharedRadius, sharedRadius); }
+  void radius(size_t sharedRadius) { radius(sharedRadius, sharedRadius, sharedRadius); }
 
   /// @brief Change the radius for every directions
   /// @param radiusHeight New radius for the height
   /// @param radiusWidth New radius for the width
   /// @param radiusDepth New radius for the depth
-  void radius(uint32_t radiusDepth, uint32_t radiusHeight, uint32_t radiusWidth) {
+  void radius(size_t radiusDepth, size_t radiusHeight, size_t radiusWidth) {
     radiusHeight_ = radiusHeight;
     radiusWidth_ = radiusWidth;
     radiusDepth_ = radiusDepth;
@@ -195,7 +195,7 @@ class FastLoaderConfiguration {
   /// @param level Property pyramid level
   /// @param release Number of time a view should return into the graph before being discarded and be available to a
   /// new request
-  void releaseCount(uint32_t level, uint32_t release) {
+  void releaseCount(size_t level, size_t release) {
     if (level > levels_) {
       std::ostringstream oss;
       oss
@@ -208,7 +208,7 @@ class FastLoaderConfiguration {
   /// @brief Define the number of views available to be used at the same time
   /// @param level Property pyramid level
   /// @param numberViewAvailable Number of views available to be used at the same time
-  void viewAvailable(uint32_t level, uint32_t numberViewAvailable) {
+  void viewAvailable(size_t level, size_t numberViewAvailable) {
     if (level > levels_) {
       std::ostringstream oss;
       oss
@@ -221,7 +221,7 @@ class FastLoaderConfiguration {
   /// @brief Define the TileLoader Cache capacity
   /// @param level Property pyramid level
   /// @param capacity TileLoader Cache capacity
-  void cacheCapacity(uint32_t level, uint32_t capacity) {
+  void cacheCapacity(size_t level, size_t capacity) {
     if (level > levels_) {
       std::ostringstream oss;
       oss
@@ -295,7 +295,7 @@ class FastLoaderConfiguration {
       throw (std::runtime_error(oss.str()));
     }
 
-    for (uint32_t level = 0; level < tileLoader_->numberPyramidLevels(); ++level) {
+    for (size_t level = 0; level < tileLoader_->numberPyramidLevels(); ++level) {
       if (tileLoader_->tileWidth(level) == 0
           || tileLoader_->tileHeight(level) == 0
           || tileLoader_->tileDepth(level) == 0) {

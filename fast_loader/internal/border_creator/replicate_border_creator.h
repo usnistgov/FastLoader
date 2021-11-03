@@ -58,7 +58,7 @@ class ReplicateBorderCreator : public AbstractBorderCreator<ViewType> {
   /// @brief Copy border values, from the view into the view
   /// @param view AbstractView to fill
   void fillBorderWithExistingValues(std::shared_ptr<ViewType> const &view) final {
-    uint32_t
+    size_t
         topFill = view->viewData()->topFill(),
         bottomFill = view->viewData()->bottomFill(),
         rightFill = view->viewData()->rightFill(),
@@ -74,8 +74,8 @@ class ReplicateBorderCreator : public AbstractBorderCreator<ViewType> {
 
     auto origin = view->viewOrigin();
 
-    for (uint32_t layer = frontFill; layer < viewDepth - backFill; ++layer) {
-      for (uint32_t row = topFill; row < viewHeight - bottomFill; ++row) {
+    for (size_t layer = frontFill; layer < viewDepth - backFill; ++layer) {
+      for (size_t row = topFill; row < viewHeight - bottomFill; ++row) {
         // L
         std::fill_n(
             origin + (layer * viewWidth * viewHeight + row * viewWidth) * numberChannels,
@@ -88,7 +88,7 @@ class ReplicateBorderCreator : public AbstractBorderCreator<ViewType> {
             *(origin +
               ((layer * viewWidth * viewHeight + row * viewWidth + viewWidth - rightFill - 1) * numberChannels)));
       }
-      for (uint32_t row = 0; row < topFill; ++row) {
+      for (size_t row = 0; row < topFill; ++row) {
         // UL
         std::fill_n(
             origin + (layer * viewWidth * viewHeight + row * viewWidth) * numberChannels,
@@ -106,7 +106,7 @@ class ReplicateBorderCreator : public AbstractBorderCreator<ViewType> {
             *(origin +
               ((layer * viewWidth * viewHeight + row * viewWidth + viewWidth - rightFill - 1) * numberChannels)));
       }
-      for (uint32_t row = viewHeight - bottomFill; row < viewHeight; ++row) {
+      for (size_t row = viewHeight - bottomFill; row < viewHeight; ++row) {
         // BL
         std::fill_n(
             origin + (layer * viewWidth * viewHeight + row * viewWidth) * numberChannels,
@@ -132,7 +132,7 @@ class ReplicateBorderCreator : public AbstractBorderCreator<ViewType> {
     }
 
     // Front
-    for (uint32_t layer = 0; layer < frontFill; ++layer) {
+    for (size_t layer = 0; layer < frontFill; ++layer) {
       std::copy_n(
           origin + (frontFill * viewHeight * viewWidth) * numberChannels,
           viewHeight * viewWidth * numberChannels,
@@ -141,7 +141,7 @@ class ReplicateBorderCreator : public AbstractBorderCreator<ViewType> {
     }
 
     // Back
-    for (uint32_t layer = viewDepth - backFill; layer < viewDepth; ++layer) {
+    for (size_t layer = viewDepth - backFill; layer < viewDepth; ++layer) {
       std::copy_n(
           origin + ((viewDepth - backFill - 1) * viewHeight * viewWidth) * numberChannels,
           viewHeight * viewWidth * numberChannels,

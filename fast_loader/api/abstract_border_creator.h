@@ -55,7 +55,7 @@ class AbstractBorderCreator {
  protected:
   /// @brief Structure to embed index to register the copy
   struct CopyPosition {
-    uint32_t
+    size_t
         indexTile, ///< Tile's index
         posBeginTile, ///< Tile's local position
         posBeginView, ///< AbstractView's local position

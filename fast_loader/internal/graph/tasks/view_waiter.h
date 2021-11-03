@@ -37,7 +37,7 @@ class ViewWaiter : public hh::AbstractTask<ViewDataType, IndexRequest> {
   std::shared_ptr<ViewCounter < ViewType>>viewCounter_ {}; ///< FastLoader's ViewCounter
   bool ordered_ = false; ///< Ordering flag
 
-  std::shared_ptr<std::vector<uint32_t>>
+  std::shared_ptr<std::vector<size_t>>
       vFullHeight_{},   ///< List of file height for all levels
       vFullWidth_{},    ///< List of file width for all levels
       vFullDepth_{},    ///< List of file depth for all levels
@@ -45,7 +45,7 @@ class ViewWaiter : public hh::AbstractTask<ViewDataType, IndexRequest> {
       vTileWidth_{},    ///< List of tile width for all levels
       vTileDepth_{};    ///< List of tile depth for all levels
 
-  uint32_t
+  size_t
       fullHeight_ = 0,      ///< Full height for this level
       fullWidth_ = 0,       ///< Full width for this level
       fullDepth_ = 0,       ///< Full depth for this level
@@ -83,19 +83,19 @@ class ViewWaiter : public hh::AbstractTask<ViewDataType, IndexRequest> {
   ViewWaiter(
       std::shared_ptr<ViewCounter<ViewType>> viewCounter,
       bool ordered,
-      uint32_t fullHeight, uint32_t fullWidth, uint32_t fullDepth,
-  uint32_t tileHeight, uint32_t tileWidth, uint32_t tileDepth, uint32_t numberChannels,
-  uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth,
-  FillingType fillingType, uint32_t level)
+      size_t fullHeight, size_t fullWidth, size_t fullDepth,
+  size_t tileHeight, size_t tileWidth, size_t tileDepth, size_t numberChannels,
+  size_t radiusHeight, size_t radiusWidth, size_t radiusDepth,
+  FillingType fillingType, size_t level)
   : hh::AbstractTask<ViewDataType, IndexRequest>("AbstractView Waiter"),
   viewCounter_ (viewCounter), ordered_(ordered),
   fullHeight_(fullHeight), fullWidth_(fullWidth), fullDepth_(fullDepth),
   tileHeight_(tileHeight), tileWidth_(tileWidth), tileDepth_(tileDepth), numberChannels_(numberChannels),
   radiusHeight_(radiusHeight), radiusWidth_(radiusWidth), radiusDepth_(radiusDepth),
   level_(level), fillingType_(fillingType) {
-    numTilesWidth_ = (uint32_t) ceil((double) fullWidth_ / tileWidth_);
-    numTilesHeight_ = (uint32_t) ceil((double) fullHeight_ / tileHeight_);
-    numTilesDepth_ = (uint32_t) ceil((double) fullDepth_ / tileDepth_);
+    numTilesWidth_ = (size_t) ceil((double) fullWidth_ / tileWidth_);
+    numTilesHeight_ = (size_t) ceil((double) fullHeight_ / tileHeight_);
+    numTilesDepth_ = (size_t) ceil((double) fullDepth_ / tileDepth_);
   }
 
   /// @brief ViewWaiter constructor used by the copy
@@ -115,15 +115,15 @@ class ViewWaiter : public hh::AbstractTask<ViewDataType, IndexRequest> {
   /// @param level Level
   ViewWaiter(std::shared_ptr<ViewCounter<ViewType>> viewCounter,
              bool ordered,
-             std::shared_ptr<std::vector<uint32_t>> &vFullHeight,
-             std::shared_ptr<std::vector<uint32_t>> &vFullWidth,
-             std::shared_ptr<std::vector<uint32_t>> &vFullDepth,
-             std::shared_ptr<std::vector<uint32_t>> &vTileHeight,
-             std::shared_ptr<std::vector<uint32_t>> &vTileWidth,
-             std::shared_ptr<std::vector<uint32_t>> &vTileDepth,
-             uint32_t numberChannels,
-             uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth,
-             FillingType fillingType, uint32_t level = 0 )
+             std::shared_ptr<std::vector<size_t>> &vFullHeight,
+             std::shared_ptr<std::vector<size_t>> &vFullWidth,
+             std::shared_ptr<std::vector<size_t>> &vFullDepth,
+             std::shared_ptr<std::vector<size_t>> &vTileHeight,
+             std::shared_ptr<std::vector<size_t>> &vTileWidth,
+             std::shared_ptr<std::vector<size_t>> &vTileDepth,
+             size_t numberChannels,
+             size_t radiusHeight, size_t radiusWidth, size_t radiusDepth,
+             FillingType fillingType, size_t level = 0 )
              : ViewWaiter(
                  viewCounter, ordered,
                  vFullHeight->at(level), vFullWidth->at(level), vFullDepth->at(level),

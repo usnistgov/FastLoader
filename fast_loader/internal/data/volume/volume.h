@@ -32,7 +32,7 @@ namespace internal {
 
 /// @brief Volume to copy
 class Volume {
-  uint32_t
+  size_t
       rowBegin_{}, ///< Volume's minimum row
       colBegin_{}, ///< Volume's minimum column
       layerBegin_{}, ///< Volume's minimum layer
@@ -48,7 +48,7 @@ class Volume {
   /// @param height Volume's height
   /// @param width Volume's width
   /// @param depth Volume's depth
-  Volume(uint32_t rowBegin, uint32_t colBegin, uint32_t layerBegin, uint32_t height, uint32_t width, uint32_t depth)
+  Volume(size_t rowBegin, size_t colBegin, size_t layerBegin, size_t height, size_t width, size_t depth)
       : rowBegin_(rowBegin),
         colBegin_(colBegin),
         layerBegin_(layerBegin),
@@ -58,33 +58,33 @@ class Volume {
 
   /// @brief Volume's minimum row accessor
   /// @return Volume's minimum row
-  [[nodiscard]] uint32_t rowBegin() const { return rowBegin_; }
+  [[nodiscard]] size_t rowBegin() const { return rowBegin_; }
   /// @brief Volume's minimum column accessor
   /// @return Volume's minimum column
-  [[nodiscard]] uint32_t colBegin() const {return colBegin_;}
+  [[nodiscard]] size_t colBegin() const {return colBegin_;}
   /// @brief Volume's minimum layer accessor
   /// @return Volume's minimum layer
-  [[nodiscard]] uint32_t layerBegin() const {return layerBegin_;}
+  [[nodiscard]] size_t layerBegin() const {return layerBegin_;}
 
   /// @brief Volume's maximum row accessor
   /// @return Volume's maximum row
-  [[nodiscard]] uint32_t rowEnd() const { return this->rowBegin_ + this->height_; }
+  [[nodiscard]] size_t rowEnd() const { return this->rowBegin_ + this->height_; }
   /// @brief Volume's maximum column accessor
   /// @return Volume's maximum column
-  [[nodiscard]] uint32_t colEnd() const { return this->colBegin_ + this->width_; }
+  [[nodiscard]] size_t colEnd() const { return this->colBegin_ + this->width_; }
   /// @brief Volume's maximum layer accessor
   /// @return Volume's maximum layer
-  [[nodiscard]] uint32_t layerEnd() const { return this->layerBegin_ + this->depth_; }
+  [[nodiscard]] size_t layerEnd() const { return this->layerBegin_ + this->depth_; }
 
   /// @brief Volume's height accessor
   /// @return Volume's height
-  [[nodiscard]] uint32_t height() const {return height_;}
+  [[nodiscard]] size_t height() const {return height_;}
   /// @brief Volume's width accessor
   /// @return Volume's width
-  [[nodiscard]] uint32_t width() const {return width_;}
+  [[nodiscard]] size_t width() const {return width_;}
   /// @brief Volume's depth accessor
   /// @return Volume's depth
-  [[nodiscard]] uint32_t depth() const {return depth_;}
+  [[nodiscard]] size_t depth() const {return depth_;}
 
   /// @brief Equality operator
   /// @param rhs Volume to compare

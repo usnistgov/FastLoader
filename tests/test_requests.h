@@ -27,7 +27,7 @@
 #include "../fast_loader/internal/traversal/naive_traversal.h"
 
 void basicRequest(){
-  uint32_t
+  size_t
       fileSize = 5,
       physicalTile = 1;
   auto tl = std::make_shared<VirtualFileTileLoader>(
@@ -51,7 +51,7 @@ void basicRequest(){
 }
 
 void testOrdering(){
-  uint32_t
+  size_t
       fileSize = 5,
       physicalTile = 1;
 

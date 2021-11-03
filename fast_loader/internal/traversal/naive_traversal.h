@@ -40,14 +40,14 @@ class NaiveTraversal : public AbstractTraversal {
   /// @brief Traversal accessor
   /// @param level Pyramid level requested
   /// @return Vector of (row, column, layer) representing the traversal
-  [[nodiscard]] std::vector<std::array<uint32_t, 3>> traversal(
-      uint32_t numberTileHeight, uint32_t numberTileWidth, uint32_t numberTileDepth) const final{
-    std::vector<std::array<uint32_t, 3>> traversal {};
+  [[nodiscard]] std::vector<std::array<size_t, 3>> traversal(
+      size_t numberTileHeight, size_t numberTileWidth, size_t numberTileDepth) const final{
+    std::vector<std::array<size_t, 3>> traversal {};
     traversal.reserve(numberTileDepth * numberTileHeight * numberTileWidth);
-    for (uint32_t layer = 0; layer < numberTileDepth; ++layer) {
-      for (uint32_t row = 0; row < numberTileHeight; ++row) {
-        for (uint32_t col = 0; col < numberTileWidth; ++col) {
-          traversal.push_back(std::array<uint32_t, 3>{row, col, layer});
+    for (size_t layer = 0; layer < numberTileDepth; ++layer) {
+      for (size_t row = 0; row < numberTileHeight; ++row) {
+        for (size_t col = 0; col < numberTileWidth; ++col) {
+          traversal.push_back(std::array<size_t, 3>{row, col, layer});
         }
       }
     }

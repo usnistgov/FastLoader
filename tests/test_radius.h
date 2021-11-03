@@ -9,9 +9,9 @@
 #include "tile_loaders/virtual_file_tile_channel_loader.h"
 
 std::vector<int> groundTruthGenerator(
-    uint32_t indexRow, uint32_t indexColumn, uint32_t indexLayer,
-    uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth,
-    uint32_t numberChannel) {
+    size_t indexRow, size_t indexColumn, size_t indexLayer,
+    size_t radiusHeight, size_t radiusWidth, size_t radiusDepth,
+    size_t numberChannel) {
 
   static std::array<int, 125> const file =
       {111, 112, 113, 114, 115, 121, 122, 123, 124, 125, 131, 132, 133, 134, 135, 141, 142, 143, 144, 145, 151, 152,
@@ -44,15 +44,15 @@ std::vector<int> groundTruthGenerator(
       }
   };
 
-  uint32_t const twoDimensionView = (2 + 2 * radiusWidth) * (2 + 2 * radiusHeight);
+  size_t const twoDimensionView = (2 + 2 * radiusWidth) * (2 + 2 * radiusHeight);
 
   std::vector<int>
       truth((2 + 2 * radiusDepth) * (2 + 2 * radiusWidth) * (2 + 2 * radiusHeight) * numberChannel, 0);
 
-  for (uint32_t layer = 0; layer < size[indexLayer][radiusDepth]; ++layer) {
-    for (uint32_t row = 0; row < size[indexRow][radiusHeight]; ++row) {
-      for (uint32_t col = 0; col < size[indexColumn][radiusWidth]; ++col) {
-        for (uint32_t channel = 0; channel < numberChannel; ++channel) {
+  for (size_t layer = 0; layer < size[indexLayer][radiusDepth]; ++layer) {
+    for (size_t row = 0; row < size[indexRow][radiusHeight]; ++row) {
+      for (size_t col = 0; col < size[indexColumn][radiusWidth]; ++col) {
+        for (size_t channel = 0; channel < numberChannel; ++channel) {
           truth.at(
               ((layer + minView[indexLayer][radiusDepth]) * (twoDimensionView)
                   + (row + minView[indexRow][radiusHeight]) * (2 + 2 * radiusWidth)
@@ -78,8 +78,8 @@ void testBasicRadius() {
   uint16_t const tileWidth = 2;
   uint16_t const tileDepth = 2;
 
-  std::vector<uint32_t> const vectorChannels{1, 2, 3};
-  std::vector<uint32_t> const radii{0, 1, 2, 3, 4, 5};
+  std::vector<size_t> const vectorChannels{1, 2, 3};
+  std::vector<size_t> const radii{0, 1, 2, 3, 4, 5};
 
   for (auto radiusHeight : radii) {
     for (auto radiusWidth : radii) {
@@ -122,8 +122,8 @@ void testBasicRadius() {
 }
 
 std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> basicFLChannelsRadii(
-    uint32_t fileSize, uint32_t physicalTile, uint32_t numberChannels,
-    uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth, bool useReplicate = false) {
+    size_t fileSize, size_t physicalTile, size_t numberChannels,
+    size_t radiusHeight, size_t radiusWidth, size_t radiusDepth, bool useReplicate = false) {
   auto tl = std::make_shared<VirtualFileTileChannelLoader>(
       1,
       fileSize, fileSize, fileSize,
@@ -138,13 +138,13 @@ std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> basicFLChannelsRadii(
 }
 
 std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> adaptiveFLChannelsRadii(
-    uint32_t fileSize, uint32_t logicalSize, uint32_t physicalTile, uint32_t numberChannels,
-    uint32_t radiusHeight, uint32_t radiusWidth, uint32_t radiusDepth, bool useReplicate = false) {
+    size_t fileSize, size_t logicalSize, size_t physicalTile, size_t numberChannels,
+    size_t radiusHeight, size_t radiusWidth, size_t radiusDepth, bool useReplicate = false) {
   auto tl = std::make_shared<VirtualFileAdaptiveTileChannelLoader>(
       1,
       fileSize, fileSize, fileSize,
-      std::vector<uint32_t>{logicalSize}, std::vector<uint32_t>{logicalSize}, std::vector<uint32_t>{logicalSize},
-      std::vector<uint32_t>{5},
+      std::vector<size_t>{logicalSize}, std::vector<size_t>{logicalSize}, std::vector<size_t>{logicalSize},
+      std::vector<size_t>{5},
       physicalTile, physicalTile, physicalTile, numberChannels);
   auto options = std::make_unique<fl::FastLoaderConfiguration<fl::DefaultView<int>>>(tl);
   if (useReplicate){
@@ -156,10 +156,10 @@ std::shared_ptr<fl::FastLoaderGraph<fl::DefaultView<int>>> adaptiveFLChannelsRad
 }
 
 void testAdaptiveTLChannelsRadii(bool useReplicate = false) {
-  uint32_t const fileSize = 5;
-  std::vector<uint32_t> const tileSize{1, 2, 5};
-  std::vector<uint32_t> const vNumberChannels{1, 5};
-  std::vector<uint32_t> const radii{0, 1, 2, 3, 4, 5};
+  size_t const fileSize = 5;
+  std::vector<size_t> const tileSize{1, 2, 5};
+  std::vector<size_t> const vNumberChannels{1, 5};
+  std::vector<size_t> const radii{0, 1, 2, 3, 4, 5};
 
   for (auto numberChannels: vNumberChannels) {
     for (auto radiusHeight : radii) {

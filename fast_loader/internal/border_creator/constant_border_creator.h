@@ -64,7 +64,7 @@ class ConstantBorderCreator : public AbstractBorderCreator<ViewType> {
   /// @brief Fill the border with a value
   /// @param view AbstractView to fill
   void fillBorderWithExistingValues(std::shared_ptr<ViewType> const &view) override {
-    uint32_t
+    size_t
         topFill = view->viewData()->topFill(),
         bottomFill = view->viewData()->bottomFill(),
         rightFill = view->viewData()->rightFill(),
@@ -87,8 +87,8 @@ class ConstantBorderCreator : public AbstractBorderCreator<ViewType> {
         viewHeight * viewWidth * backFill * numberChannels,
         value_);
 
-    for(uint32_t layer = frontFill; layer < viewDepth - backFill; ++layer) {
-      for (uint32_t row = topFill; row < viewHeight - bottomFill; ++row) {
+    for(size_t layer = frontFill; layer < viewDepth - backFill; ++layer) {
+      for (size_t row = topFill; row < viewHeight - bottomFill; ++row) {
         // L
         std::fill_n(
             origin + (layer * (viewHeight * viewWidth) + (row * viewWidth)) * numberChannels,
@@ -100,7 +100,7 @@ class ConstantBorderCreator : public AbstractBorderCreator<ViewType> {
             rightFill * numberChannels,
             value_);
       }
-      for (uint32_t row = 0; row < topFill; ++row) {
+      for (size_t row = 0; row < topFill; ++row) {
         // UL
         std::fill_n(
             origin + (layer * (viewHeight * viewWidth) + (row * viewWidth)) * numberChannels,
@@ -117,7 +117,7 @@ class ConstantBorderCreator : public AbstractBorderCreator<ViewType> {
             rightFill * numberChannels,
             value_);
       }
-      for (uint32_t row = viewHeight - bottomFill; row < viewHeight; ++row) {
+      for (size_t row = viewHeight - bottomFill; row < viewHeight; ++row) {
         // BL
         std::fill_n(
             origin + (layer * (viewHeight * viewWidth) + (row * viewWidth)) * numberChannels,

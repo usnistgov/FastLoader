@@ -47,8 +47,8 @@
 //
 //  virtual ~SpiralTraversal() = default;
 //
-//  [[nodiscard]] std::vector<std::pair<uint32_t, uint32_t>> traversal(uint32_t level) const override {
-//    std::vector<std::pair<uint32_t, uint32_t>> traversal;
+//  [[nodiscard]] std::vector<std::pair<size_t, size_t>> traversal(size_t level) const override {
+//    std::vector<std::pair<size_t, size_t>> traversal;
 //
 //    static std::map<Direction, Direction> nextDirection = {
 //        {Direction::EAST, Direction::SOUTH},
@@ -62,7 +62,7 @@
 //    Direction
 //        direction = Direction::EAST;
 //
-//    uint32_t
+//    size_t
 //        row = 0,
 //        col = 0,
 //        step = 0;
@@ -71,7 +71,7 @@
 //        rowNext = 0,
 //        colNext = 0;
 //
-//    traversal.emplace_back((uint32_t) row, (uint32_t) col);
+//    traversal.emplace_back((size_t) row, (size_t) col);
 //    hasNotBeenVisited[row][col] = false;
 //
 //    while (step < this->numberTileHeight(level) * this->numberTileWidth(level) - 1) {
@@ -82,8 +82,8 @@
 //                 this->numberTileWidth(level),
 //                 hasNotBeenVisited)) {
 //        ++step;
-//        row = (uint32_t) rowNext;
-//        col = (uint32_t) colNext;
+//        row = (size_t) rowNext;
+//        col = (size_t) colNext;
 //        hasNotBeenVisited[row][col] = false;
 //        traversal.emplace_back(row, col);
 //      } else {
@@ -100,8 +100,8 @@
 //  /// \param rowNext Next row
 //  /// \param colNext Next column
 //  static void nextStep(Direction direction,
-//                       uint32_t row,
-//                       uint32_t col,
+//                       size_t row,
+//                       size_t col,
 //                       int32_t &rowNext,
 //                       int32_t &colNext) {
 //    switch (direction) {
@@ -129,12 +129,12 @@
 //  /// \return True if tile free, else Fasle
 //  static bool isFree(const int32_t &rowTest,
 //                     const int32_t &colTest,
-//                     const uint32_t &numberTileHeight,
-//                     const uint32_t &numberTileWidth,
+//                     const size_t &numberTileHeight,
+//                     const size_t &numberTileWidth,
 //                     const std::vector<std::vector<bool>> &hasNotBeenVisited) {
 //    return
-//        !(rowTest == -1 || (uint32_t) rowTest == numberTileHeight || colTest == -1 ||
-//            (uint32_t) colTest == numberTileWidth) &&
+//        !(rowTest == -1 || (size_t) rowTest == numberTileHeight || colTest == -1 ||
+//            (size_t) colTest == numberTileWidth) &&
 //            hasNotBeenVisited[rowTest][colTest];
 //  }
 //};

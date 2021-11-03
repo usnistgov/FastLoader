@@ -53,16 +53,16 @@ class AbstractTraversal {
   /// @brief Get the traversal vector for a level
   /// @param level Pyramid level
   /// @return Traversal vector for a level
-  [[nodiscard]] virtual std::vector<std::array<uint32_t, 3>> traversal(
-      uint32_t numberTileHeight, uint32_t numberTileWidth, uint32_t numberTileDepth) const = 0;
+  [[nodiscard]] virtual std::vector<std::array<size_t, 3>> traversal(
+      size_t numberTileHeight, size_t numberTileWidth, size_t numberTileDepth) const = 0;
 
   /// @brief Print method
   /// @param level Pyramid level
   /// @param os Output stream operator
   /// @return Output stream operator
-  std::ostream &print(uint32_t numberTileHeight,
-                      uint32_t numberTileWidth,
-                      uint32_t numberTileDepth,
+  std::ostream &print(size_t numberTileHeight,
+                      size_t numberTileWidth,
+                      size_t numberTileDepth,
                       std::ostream &os = std::cout) const {
     int
         sizeValue = 0;
@@ -77,11 +77,11 @@ class AbstractTraversal {
       sizeValue++;
     }
 
-    std::vector<std::vector<std::vector<uint32_t>>> mapToPrint(
-        numberTileDepth, std::vector<std::vector<uint32_t>>(
-            numberTileHeight, std::vector<uint32_t>(numberTileWidth)));
+    std::vector<std::vector<std::vector<size_t>>> mapToPrint(
+        numberTileDepth, std::vector<std::vector<size_t>>(
+            numberTileHeight, std::vector<size_t>(numberTileWidth)));
 
-    uint32_t stepNumber = 0;
+    size_t stepNumber = 0;
 
     for (auto step: this->traversal(numberTileHeight, numberTileWidth, numberTileDepth)) {
       assert(step[0] < numberTileHeight && step[1] < numberTileWidth && step[2] < numberTileDepth);
@@ -91,11 +91,11 @@ class AbstractTraversal {
 
     os << "Traversal " << this->name() << " (" << numberTileHeight << "x" << numberTileWidth << "x" << numberTileDepth
        << ")\n";
-    for (uint32_t layer = 0; layer < numberTileDepth; ++layer) {
+    for (size_t layer = 0; layer < numberTileDepth; ++layer) {
       os << "Layer:" << layer << "\n";
-      for (uint32_t row = 0; row < numberTileHeight; ++row) {
+      for (size_t row = 0; row < numberTileHeight; ++row) {
         os << "\t";
-        for (uint32_t col = 0; col < numberTileWidth; ++col) {
+        for (size_t col = 0; col < numberTileWidth; ++col) {
           os << std::setw(sizeValue) << mapToPrint[layer][row][col] << " ";
         }
         os << "\n";

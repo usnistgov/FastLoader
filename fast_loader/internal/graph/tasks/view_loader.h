@@ -58,7 +58,7 @@ class ViewLoader : public hh::AbstractTask<TileRequest<ViewType>, ViewDataType> 
     auto view = std::make_shared<ViewType>();
     view->viewData(viewData);
 
-    uint32_t
+    size_t
         tileHeight = viewData->tileHeight(),
         tileWidth = viewData->tileWidth(),
         tileDepth = viewData->tileDepth(),
@@ -86,21 +86,21 @@ class ViewLoader : public hh::AbstractTask<TileRequest<ViewType>, ViewDataType> 
     std::ostringstream oss;
 
     // Add tile request for tiles that exists in file
-    for (uint32_t layer = viewData->indexLayerMinTile(); layer < viewData->indexLayerMaxTile(); ++layer) {
+    for (size_t layer = viewData->indexLayerMinTile(); layer < viewData->indexLayerMaxTile(); ++layer) {
       frontUpperLeftTileLayerGlobal = layer * tileDepth;
       layerFrom = frontUpperLeftTileLayerGlobal <= minLayerFile ? (minLayerFile - frontUpperLeftTileLayerGlobal) : 0;
       depthToCopy =
           std::min(maxLayerFile, frontUpperLeftTileLayerGlobal + tileDepth) - layerFrom - frontUpperLeftTileLayerGlobal;
 
       rowAlreadyFilled = viewData->topFill();
-      for (uint32_t row = viewData->indexRowMinTile(); row < viewData->indexRowMaxTile(); ++row) {
+      for (size_t row = viewData->indexRowMinTile(); row < viewData->indexRowMaxTile(); ++row) {
         frontUpperLeftTileRowGlobal = row * tileHeight;
         rowFrom = frontUpperLeftTileRowGlobal <= minRowFile ? (minRowFile - frontUpperLeftTileRowGlobal) : 0;
         heightToCopy =
             std::min(maxRowFile, frontUpperLeftTileRowGlobal + tileHeight) - rowFrom - frontUpperLeftTileRowGlobal;
 
         colAlreadyFilled = viewData->leftFill();
-        for (uint32_t column = viewData->indexColMinTile(); column < viewData->indexColMaxTile(); ++column) {
+        for (size_t column = viewData->indexColMinTile(); column < viewData->indexColMaxTile(); ++column) {
           frontUpperLeftTileColGlobal = column * tileWidth;
           colFrom = frontUpperLeftTileColGlobal <= minColFile ? (minColFile - frontUpperLeftTileColGlobal) : 0;
           widthToCopy =

@@ -113,9 +113,9 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
   /// @param tileRequestData Tile Request to process
   void execute(std::shared_ptr<internal::TileRequest<ViewType>> tileRequestData) final {
     std::shared_ptr<internal::CachedTile<DataType>> cachedTile;
-    uint32_t row = tileRequestData->indexRowTileAsked();
-    uint32_t col = tileRequestData->indexColTileAsked();
-    uint32_t layer = tileRequestData->indexLayerTileAsked();
+    size_t row = tileRequestData->indexRowTileAsked();
+    size_t col = tileRequestData->indexColTileAsked();
+    size_t layer = tileRequestData->indexLayerTileAsked();
 
     // Get locked tile from the cache, can be empty or not
     cachedTile = cache_->lockedTile(row, col, layer);
@@ -156,10 +156,10 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
   /// @param indexLayerGlobalTile Tile's layer index in the file to load
   /// @param level Tile's pyramidal level in the file to load
   virtual void loadTileFromFile(std::shared_ptr<std::vector<DataType>> tile,
-                                uint32_t indexRowGlobalTile,
-                                uint32_t indexColGlobalTile,
-                                uint32_t indexLayerGlobalTile,
-                                uint32_t level) = 0;
+                                size_t indexRowGlobalTile,
+                                size_t indexColGlobalTile,
+                                size_t indexLayerGlobalTile,
+                                size_t level) = 0;
 
   /// \brief Copy Function
   /// \return ATileLoader copied
@@ -168,61 +168,61 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
   /// \brief Getter to full Height
   /// @param level file's level considered
   /// \return Image height
-  [[nodiscard]] virtual uint32_t fullHeight(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t fullHeight(size_t level) const = 0;
 
   /// \brief Getter to full Width
   /// @param level file's level considered
   /// \return Image Width
-  [[nodiscard]] virtual uint32_t fullWidth(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t fullWidth(size_t level) const = 0;
 
   /// \brief Getter to full Depth (default 1)
   /// @param level file's level considered
   /// \return Image Depth
-  [[nodiscard]] virtual uint32_t fullDepth([[maybe_unused]] uint32_t level) const {
+  [[nodiscard]] virtual size_t fullDepth([[maybe_unused]] size_t level) const {
     return 1;
   }
 
   /// \brief Getter to the number of channels (default 1)
   /// \return Number of pixel's channels
-  [[nodiscard]] virtual uint32_t numberChannels() const {
+  [[nodiscard]] virtual size_t numberChannels() const {
     return 1;
   }
 
   /// \brief Getter to tile Width
   /// @param level tile's level considered
   /// \return Tile Width
-  [[nodiscard]] virtual uint32_t tileWidth(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t tileWidth(size_t level) const = 0;
 
   /// \brief Getter to tile Height
   /// @param level tile's level considered
   /// \return Tile Height
-  [[nodiscard]] virtual uint32_t tileHeight(uint32_t level) const = 0;
+  [[nodiscard]] virtual size_t tileHeight(size_t level) const = 0;
 
   /// \brief Getter to tile Height (default 1)
   /// @param level tile's level considered
   /// \return Tile Height
-  [[nodiscard]] virtual uint32_t tileDepth([[maybe_unused]] uint32_t level) const {
+  [[nodiscard]] virtual size_t tileDepth([[maybe_unused]] size_t level) const {
     return 1;
   }
 
   /// @brief Number tiles in height accessor for a level
   /// @param level Level asked [default 0]
   /// @return Number tiles in height for a level
-  [[nodiscard]] uint32_t numberTileHeight(uint32_t level = 0) const {
-    return (uint32_t) ceil((double) (fullHeight(level)) / tileHeight(level));
+  [[nodiscard]] size_t numberTileHeight(size_t level = 0) const {
+    return (size_t) ceil((double) (fullHeight(level)) / tileHeight(level));
   }
   /// @brief Number tiles in width accessor for a level
   /// @param level Level asked [default 0]
   /// @return Number tiles in width for a level
-  [[nodiscard]] uint32_t numberTileWidth(uint32_t level = 0) const {
-    return (uint32_t) ceil((double) (fullWidth(level)) / tileWidth(level));
+  [[nodiscard]] size_t numberTileWidth(size_t level = 0) const {
+    return (size_t) ceil((double) (fullWidth(level)) / tileWidth(level));
   }
 
   /// @brief Number tiles in depth accessor for a level
   /// @param level Level asked [default 0]
   /// @return Number tiles in depth for a level
-  [[nodiscard]] uint32_t numberTileDepth(uint32_t level = 0) const {
-    return (uint32_t) ceil((double) (fullDepth(level)) / tileDepth(level));
+  [[nodiscard]] size_t numberTileDepth(size_t level = 0) const {
+    return (size_t) ceil((double) (fullDepth(level)) / tileDepth(level));
   }
 
   /// \brief Get file bits per samples
@@ -231,12 +231,12 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
 
   /// \brief Get number of pyramid levels
   /// \return Number of Pyramid levels
-  [[nodiscard]] virtual uint32_t numberPyramidLevels() const = 0;
+  [[nodiscard]] virtual size_t numberPyramidLevels() const = 0;
 
   /// \brief Get the down scalar factor for a specific pyramid level
   /// \param level Pyramid level
   /// \return The down scalar factor for a specific pyramid level
-  virtual float downScaleFactor([[maybe_unused]] uint32_t level) { return 1; }
+  virtual float downScaleFactor([[maybe_unused]] size_t level) { return 1; }
 
   /// @brief Default print information in the dot file, add miss rate
   /// @return A string with the miss rate
@@ -257,7 +257,7 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
   void copyTileToView(
       std::shared_ptr<internal::TileRequest<ViewType>> tileRequestData,
       std::shared_ptr<internal::CachedTile<DataType>> cachedTile) {
-    uint32_t
+    size_t
         tileWidth = this->tileWidth(this->graphId()),
         tileHeight = this->tileHeight(this->graphId()),
         viewWidth = tileRequestData->view()->viewWidth(),

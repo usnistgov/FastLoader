@@ -54,7 +54,7 @@ class Cache {
   std::mutex
       cacheMutex_{};            ///< Cache mutex
 
-  uint32_t
+  size_t
       nbTilesCache_,          ///< Number of tiles allocated
       numTilesHeight_,        ///< Number of tiles in a column
       numTilesWidth_,         ///< Number of tiles in a row
@@ -80,13 +80,13 @@ class Cache {
   /// @param tileDepth Tile depth
   /// @param numberChannels Number of pixel channels
   Cache(
-      uint32_t nbTilesCache,
-      uint32_t numTilesHeight, uint32_t numTilesWidth, uint32_t numTilesDepth,
-      uint32_t tileHeight, uint32_t tileWidth, uint32_t tileDepth, uint32_t numberChannels)
+      size_t nbTilesCache,
+      size_t numTilesHeight, size_t numTilesWidth, size_t numTilesDepth,
+      size_t tileHeight, size_t tileWidth, size_t tileDepth, size_t numberChannels)
       : nbTilesCache_(nbTilesCache),
         numTilesHeight_(numTilesHeight), numTilesWidth_(numTilesWidth), numTilesDepth_(numTilesDepth),
         miss_(0), hit_(0), accessTime_(0), recycleTime_(0) {
-    uint32_t nbTilesInImage = numTilesHeight * numTilesWidth * numTilesDepth;
+    size_t nbTilesInImage = numTilesHeight * numTilesWidth * numTilesDepth;
 
     // If the number of tiles to be cached has been set to 0 (default value), set the number to 2 * number of tiles
     // in a row
@@ -108,7 +108,7 @@ class Cache {
     );
 
     // Fill the pool
-    for (uint32_t tileCnt = 0; tileCnt < nbTilesCache_; ++tileCnt) {
+    for (size_t tileCnt = 0; tileCnt < nbTilesCache_; ++tileCnt) {
       pool_.push(std::make_shared<CachedTile<DataType>>(tileWidth, tileHeight, tileDepth, numberChannels));
     }
   }
@@ -118,15 +118,15 @@ class Cache {
 
   /// @brief Hit mergeCount accessor
   /// @return Hit mergeCount
-  [[nodiscard]] uint32_t hit() const { return hit_; }
+  [[nodiscard]] size_t hit() const { return hit_; }
 
   /// @brief Miss mergeCount accessor
   /// @return Miss mergeCount
-  [[nodiscard]] uint32_t miss() const { return miss_; }
+  [[nodiscard]] size_t miss() const { return miss_; }
 
   /// @brief Maximum number of tiles to cache accessor
   /// @return Maximum number of tiles to cache
-  [[nodiscard]] uint32_t nbTilesCache() const { return nbTilesCache_; }
+  [[nodiscard]] size_t nbTilesCache() const { return nbTilesCache_; }
 
   /// @brief Cache's pool accessor
   /// @return Cache's pool
@@ -152,7 +152,7 @@ class Cache {
   /// @param indexCol Locked tile's index column
   /// @param indexLayer Locked tile's index layer
   /// @return Locked tile
-  CachedTileType lockedTile(uint32_t indexRow, uint32_t indexCol, uint32_t indexLayer) {
+  CachedTileType lockedTile(size_t indexRow, size_t indexCol, size_t indexLayer) {
     CachedTileType tile;
     if (!(indexRow < numTilesHeight_ && indexCol < numTilesWidth_ && indexLayer < numTilesDepth_)) {
       std::stringstream message;
@@ -185,7 +185,7 @@ class Cache {
   /// @param cache FastLoader cache to print
   /// @return Output stream
   friend std::ostream &operator<<(std::ostream &os, const Cache &cache) {
-    uint32_t numLayer = 0;
+    size_t numLayer = 0;
     os << "-------------------------------------------" << std::endl;
     os << "Cache AbstractView:" << std::endl;
     os << "Waiting Queue: " << std::endl;
@@ -232,7 +232,7 @@ class Cache {
   /// @param indexCol Tile's column
   /// @param indexLayer Tile's layer
   /// @return True if the tile is already available, else False
-  [[nodiscard]] bool isInCache(uint32_t indexRow, uint32_t indexCol, uint32_t indexLayer) {
+  [[nodiscard]] bool isInCache(size_t indexRow, size_t indexCol, size_t indexLayer) {
     return nullptr != mapCache_[indexLayer][indexRow][indexCol];
   }
 
@@ -278,7 +278,7 @@ class Cache {
   /// @param indexCol Tile's column index
   /// @param indexLayer Tile's layer index
   /// @return Locked tile
-  [[nodiscard]] CachedTileType newLockedTile(uint32_t indexRow, uint32_t indexCol, uint32_t indexLayer) {
+  [[nodiscard]] CachedTileType newLockedTile(size_t indexRow, size_t indexCol, size_t indexLayer) {
     // Get tile from the pool
     CachedTileType tile = pool_.front();
     tile->lock();
@@ -301,7 +301,7 @@ class Cache {
   /// @param indexCol Tile's column index
   /// @param indexLayer Tile's layer index
   /// @return Locked tile
-  [[nodiscard]] CachedTileType cachedLockedTile(uint32_t indexRow, uint32_t indexCol, uint32_t indexLayer) {
+  [[nodiscard]] CachedTileType cachedLockedTile(size_t indexRow, size_t indexCol, size_t indexLayer) {
     assert(mapCache_[indexLayer][indexRow][indexCol] != nullptr);
 
     // Get the tile

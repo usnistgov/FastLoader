@@ -41,10 +41,10 @@ class VirtualFileAdaptiveTileLoader : public fl::AbstractAdaptiveTileLoader<fl::
                                 uint16_t const fileHeight,
                                 uint16_t const fileWidth,
                                 uint16_t const fileDepth,
-                                std::vector<uint32_t> const &tileHeightRequestedPerLevel,
-                                std::vector<uint32_t> const &tileWidthRequestedPerLevel,
-                                std::vector<uint32_t> const &tileDepthRequestedPerLevel,
-                                const std::vector<uint32_t> &numberTilesCachePerLevel,
+                                std::vector<size_t> const &tileHeightRequestedPerLevel,
+                                std::vector<size_t> const &tileWidthRequestedPerLevel,
+                                std::vector<size_t> const &tileDepthRequestedPerLevel,
+                                const std::vector<size_t> &numberTilesCachePerLevel,
                                 uint16_t const tileHeight,
                                 uint16_t const tileWidth,
                                 uint16_t const tileDepth)
@@ -70,10 +70,10 @@ class VirtualFileAdaptiveTileLoader : public fl::AbstractAdaptiveTileLoader<fl::
   }
 
   void loadPhysicalTileFromFile(std::shared_ptr<std::vector<int>> physicalTile,
-                                uint32_t indexFileRowGlobalTile,
-                                uint32_t indexFileColGlobalTile,
-                                uint32_t indexFileLayerGlobalTile,
-                                [[maybe_unused]] uint32_t fileLevel) override {
+                                size_t indexFileRowGlobalTile,
+                                size_t indexFileColGlobalTile,
+                                size_t indexFileLayerGlobalTile,
+                                [[maybe_unused]] size_t fileLevel) override {
     size_t
         startingLayer = indexFileLayerGlobalTile * tileDepth_,
         endLayer = std::min((size_t) ((indexFileLayerGlobalTile + 1) * tileDepth_), (size_t) fileDepth_),
@@ -100,13 +100,13 @@ class VirtualFileAdaptiveTileLoader : public fl::AbstractAdaptiveTileLoader<fl::
 
   }
 
-  [[nodiscard]] uint32_t physicalTileWidth([[maybe_unused]] uint32_t level) const override {
+  [[nodiscard]] size_t physicalTileWidth([[maybe_unused]] size_t level) const override {
     return tileWidth_;
   }
-  [[nodiscard]] uint32_t physicalTileHeight([[maybe_unused]] uint32_t level) const override {
+  [[nodiscard]] size_t physicalTileHeight([[maybe_unused]] size_t level) const override {
     return tileHeight_;
   }
-  [[nodiscard]] uint32_t physicalTileDepth([[maybe_unused]] uint32_t level) const override {
+  [[nodiscard]] size_t physicalTileDepth([[maybe_unused]] size_t level) const override {
     return tileDepth_;
   }
 
@@ -126,15 +126,15 @@ class VirtualFileAdaptiveTileLoader : public fl::AbstractAdaptiveTileLoader<fl::
     );
   }
 
-  [[nodiscard]] uint32_t fullHeight([[maybe_unused]] uint32_t level) const override {
+  [[nodiscard]] size_t fullHeight([[maybe_unused]] size_t level) const override {
     return fileHeight_;
   }
 
-  [[nodiscard]] uint32_t fullWidth([[maybe_unused]] uint32_t level) const override {
+  [[nodiscard]] size_t fullWidth([[maybe_unused]] size_t level) const override {
     return fileWidth_;
   }
 
-  [[nodiscard]] uint32_t fullDepth([[maybe_unused]] uint32_t level) const override {
+  [[nodiscard]] size_t fullDepth([[maybe_unused]] size_t level) const override {
     return fileDepth_;
   }
 
@@ -142,7 +142,7 @@ class VirtualFileAdaptiveTileLoader : public fl::AbstractAdaptiveTileLoader<fl::
     return sizeof(int);
   }
 
-  [[nodiscard]] uint32_t numberPyramidLevels() const override {
+  [[nodiscard]] size_t numberPyramidLevels() const override {
     return 1;
   }
 };

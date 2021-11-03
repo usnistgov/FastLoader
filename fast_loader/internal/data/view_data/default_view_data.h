@@ -52,7 +52,7 @@ class DefaultViewData : public AbstractViewData<DataType>, public hh::MemoryData
   /// @brief Constructor from the size of the view and the number of releases
   /// @param viewSize Size of the view (number of elements)
   /// @param numberOfRelease Number of releases for a view
-  DefaultViewData(uint32_t viewSize, uint32_t numberOfRelease) : AbstractViewData<DataType>(numberOfRelease) {
+  DefaultViewData(size_t viewSize, size_t numberOfRelease) : AbstractViewData<DataType>(numberOfRelease) {
     this->data_ = new DataType[viewSize];
   }
 
@@ -60,7 +60,7 @@ class DefaultViewData : public AbstractViewData<DataType>, public hh::MemoryData
   /// @param sizesPerLevel Sizes of the view (number of elements) for all the pyramid's level
   /// @param releasesPerLevel Number of releases for a view for all the pyramid's level
   /// @param level Level of the pyramid
-  DefaultViewData(std::vector<uint32_t> sizesPerLevel, std::vector<uint32_t> releasesPerLevel, uint32_t level) :
+  DefaultViewData(std::vector<size_t> sizesPerLevel, std::vector<size_t> releasesPerLevel, size_t level) :
       DefaultViewData(sizesPerLevel[level], releasesPerLevel[level]) {}
 
   /// @brief DefaultViewData destructor, clean the raw array

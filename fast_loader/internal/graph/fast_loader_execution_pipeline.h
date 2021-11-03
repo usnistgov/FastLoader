@@ -39,7 +39,7 @@ class FastLoaderExecutionPipeline : public hh::AbstractExecutionPipeline<TileReq
   /// @param numberGraphDuplications Number of graphs into the execution pipeline
   FastLoaderExecutionPipeline(
       std::shared_ptr<hh::Graph<TileRequest<ViewType>, IndexRequest>> const &graph,
-      uint32_t const &numberGraphDuplications)
+      size_t const &numberGraphDuplications)
       : hh::AbstractExecutionPipeline<TileRequest<ViewType>, IndexRequest>(
       "Fast Loader Levels", graph, numberGraphDuplications,
       std::vector<int>(numberGraphDuplications, 0), false) {}
