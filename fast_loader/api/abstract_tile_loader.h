@@ -151,6 +151,7 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
 
   /// @brief Load a tile from the file at position (indexRowGlobalTile/indexColGlobalTile) for the pyramidal level
   /// "level"
+  /// @param tile Tile to load
   /// @param indexRowGlobalTile Tile's row index in the file to load
   /// @param indexColGlobalTile Tile's col index in the file to load
   /// @param indexLayerGlobalTile Tile's layer index in the file to load

@@ -94,6 +94,7 @@ template<class DataType>
   /// @param tile Tile to copy into
   /// @param indexRowGlobalTile Tile row index
   /// @param indexColGlobalTile Tile column index
+   /// @param indexLayerGlobalTile Tile layer index
   /// @param level Tile's level
   void loadTileFromFile(std::shared_ptr<std::vector<DataType>> tile,
                         size_t indexRowGlobalTile, size_t indexColGlobalTile, [[maybe_unused]] size_t indexLayerGlobalTile,

@@ -17,18 +17,36 @@
 /// @brief FastLoader namespace
 namespace fl {
 
+/// @brief Special type of FastLoaderGraph that transforms the tiling existing in the file.
+/// Works exactly the same way of the FastLoaderGraph but ask for the the new tile dimensions (for all image level):
+/// -# logicalTileHeightRequestedPerLevel: heights of the tiles per level
+/// -# physicalTileWidthPerLevel_: widths of the tiles per level
+/// -# physicalTileDepthPerLevel_: depths of the tiles per level
+/// and the cache size for logical tiles (numberLogicalTilesCachePerLevel). This cache has been added to avoid extra construction of tiles from the
+/// physical tiles coming from the tile loader (the file).
+/// @tparam ViewType Type of the view.
 template<class ViewType>
 class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
 
  private:
-  using DataType = typename ViewType::data_t;
+  using DataType = typename ViewType::data_t; ///< Sample type (AbstractView element type)
   std::shared_ptr<std::vector<size_t>>
-      physicalTileHeightPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      physicalTileWidthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      physicalTileDepthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      numberLogicalTilesCachePerLevel_ = std::make_shared<std::vector<size_t>>();
+      physicalTileHeightPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Physical tile heights per level
+                                                                              /// from the tile loader
+      physicalTileWidthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Physical tile widths per level
+                                                                              /// from the tile loader
+      physicalTileDepthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Physical tile depths per level
+                                                                              /// from the tile loader
+      numberLogicalTilesCachePerLevel_ = std::make_shared<std::vector<size_t>>(); ///< Number of logical tiles cached
 
  public:
+  /// @brief AdaptiveFastLoaderGraph constructor, requires to provide the dimension of the tiles use to build the views
+  /// @param configuration FastLoaderGraph configuration. Need to be moved, and can not be modified after being set.
+  /// @param logicalTileHeightRequestedPerLevel Logical tile heights per level requested
+  /// @param logicalTileWidthRequestedPerLevel Logical tile widths per level requested
+  /// @param logicalTileDepthRequestedPerLevel Logical tile depths per level requested
+  /// @param numberLogicalTilesCachePerLevel Number of logical cached tiles per level
+  /// @param name Graph name (default: Adaptive Tile Loader)
   AdaptiveFastLoaderGraph(
       std::unique_ptr<FastLoaderConfiguration<ViewType>> configuration,
       std::vector<size_t> const &logicalTileHeightRequestedPerLevel,
@@ -315,8 +333,8 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
     this->output(viewCounter);
   }
 
+  /// @brief Default destructor
   virtual ~AdaptiveFastLoaderGraph() = default;
-
 };
 
 }

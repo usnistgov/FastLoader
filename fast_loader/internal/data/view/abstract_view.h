@@ -275,9 +275,8 @@ class AbstractView {
     }
   }
 
-  //TODO Rework documentation
-  /// @brief AbstractView as vector accessor
-  /// @return AbstractView as vector
+  /// @brief AbstractView origins centered in the central tile
+  /// @return AbstractView origins centered in the central tile
   [[nodiscard]] DataType *viewOrigin() const { return viewData()->data(); }
 
   /// @brief AbstractView origins centered in the central tile for a smaller radius accessor

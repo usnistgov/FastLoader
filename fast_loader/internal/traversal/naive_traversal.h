@@ -32,13 +32,16 @@ namespace internal {
 /// @tparam ViewType Type of view
 class NaiveTraversal : public AbstractTraversal {
  public:
+  /// @brief Default constructor
   NaiveTraversal() : AbstractTraversal("Naive Traversal"){};
 
   /// @brief Default destructor
   ~NaiveTraversal() override = default;
 
   /// @brief Traversal accessor
-  /// @param level Pyramid level requested
+  /// @param numberTileHeight Number of tiles in height
+  /// @param numberTileWidth Number of tiles in width
+  /// @param numberTileDepth Number of tiles in depth
   /// @return Vector of (row, column, layer) representing the traversal
   [[nodiscard]] std::vector<std::array<size_t, 3>> traversal(
       size_t numberTileHeight, size_t numberTileWidth, size_t numberTileDepth) const final{

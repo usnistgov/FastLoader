@@ -40,7 +40,6 @@ class AbstractTraversal {
  public:
   /// @brief Traversal constructor
   /// @param name Traversal name
-  /// @param tl Tile Loader
   explicit AbstractTraversal(std::string name) : name_(std::move(name)) {}
 
   /// @brief Default destructor
@@ -50,14 +49,19 @@ class AbstractTraversal {
   /// \return Traversal name
   [[nodiscard]] std::string const &name() const { return name_; }
 
-  /// @brief Get the traversal vector for a level
-  /// @param level Pyramid level
-  /// @return Traversal vector for a level
+
+  /// @brief Get the traversal vector from the tile dimension of the file
+  /// @param numberTileHeight Number tile in height
+  /// @param numberTileWidth Number tile in width
+  /// @param numberTileDepth Number tile in depth
+  /// @return Traversal vector
   [[nodiscard]] virtual std::vector<std::array<size_t, 3>> traversal(
       size_t numberTileHeight, size_t numberTileWidth, size_t numberTileDepth) const = 0;
 
   /// @brief Print method
-  /// @param level Pyramid level
+  /// @param numberTileHeight Number tile in height
+  /// @param numberTileWidth Number tile in width
+  /// @param numberTileDepth Number tile in depth
   /// @param os Output stream operator
   /// @return Output stream operator
   std::ostream &print(size_t numberTileHeight,

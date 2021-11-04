@@ -95,19 +95,22 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
       finishRequestingTiles_ = false; ///< Flag to indicate tiles will not be requested anymore
 
   size_t
-      numberChannels_{},
-      numberPyramidLevels_{};
+      numberChannels_{}, ///< Number of channels in the file
+      numberPyramidLevels_{}; ///< Number of pyramid levels in the file
 
   std::shared_ptr<std::vector<size_t>>
-      fullHeightPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      fullWidthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      fullDepthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      tileHeightPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      tileWidthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      tileDepthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      viewHeightPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      viewWidthPerLevel_ = std::make_shared<std::vector<size_t>>(),
-      viewDepthPerLevel_ = std::make_shared<std::vector<size_t>>();
+      fullHeightPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Full file height per level
+      fullWidthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Full file width per level
+      fullDepthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Full file depth per level
+      tileHeightPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Tile height per level used to construct the
+      /// views
+      tileWidthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Tile width per level used to construct the
+      /// views
+      tileDepthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< Tile depth per level used to construct the
+      /// views
+      viewHeightPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< View height per level
+      viewWidthPerLevel_ = std::make_shared<std::vector<size_t>>(), ///< View width per level
+      viewDepthPerLevel_ = std::make_shared<std::vector<size_t>>(); ///< View depth per level
 
  public:
   /// @brief Main FastLoaderGraph constructor
@@ -245,6 +248,8 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
   }
 
  protected:
+  /// @brief FastLoaderGraph graph
+  /// @param name Name of the FastLoaderGraph
   explicit FastLoaderGraph(std::string_view const &name) : hh::Graph<ViewType, IndexRequest>(name) {}
 
  public:

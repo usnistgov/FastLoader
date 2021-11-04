@@ -11,20 +11,28 @@ namespace fl {
 /// @brief FastLoader internal namespace
 namespace internal {
 
+/// @brief Multi-threaded task to copy [parts of] logical caches to the view
+/// @tparam ViewType Type of the view
 template<class ViewType>
 class CopyLogicalCacheToView :
     public hh::AbstractTask<fl::internal::TileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>> {
-
  private:
-  size_t const numberChannels_;
+  size_t const numberChannels_; ///< Number of channels
  public:
+  /// @brief CopyLogicalCacheToView constructor
+  /// @param numberThreads Number of thread associated to the task
+  /// @param numberChannels Number of channels per pixels
   explicit CopyLogicalCacheToView(size_t numberThreads, size_t const numberChannels) :
       hh::AbstractTask<
           fl::internal::TileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>>
           ("CopyLogicalCacheToView", numberThreads),
       numberChannels_(numberChannels) {}
+
+  /// @brief Default destructor
   virtual ~CopyLogicalCacheToView() = default;
 
+  /// @brief Implementation of the Hedgehog execute method
+  /// @param adaptiveTileRequest AdaptiveTileRequest containing all information to achieve the copy
   void execute(std::shared_ptr<fl::internal::AdaptiveTileRequest<ViewType>> adaptiveTileRequest) override {
     std::shared_ptr<fl::internal::TileRequest<ViewType>> logicalTileRequest = adaptiveTileRequest->logicalTileRequest();
     std::shared_ptr<fl::internal::CachedTile<typename ViewType::data_t>> logicalCachedTile =
@@ -223,21 +231,17 @@ class CopyLogicalCacheToView :
       } // End Reverse Layers
     } // For all copies
 
-//    global_mutex.lock();
-//    std::cerr << "Release: " << logicalCachedTile->indexRow() << ", " << logicalCachedTile->indexCol() << ", " <<
-//              logicalCachedTile->indexLayer() << std::endl;
-//    global_mutex.unlock();
     logicalCachedTile->unlock();
-
     this->addResult(logicalTileRequest);
   }
 
+  /// @brief Copy method implementation from Hedgehog library
+  /// @return A copy of the CopyLogicalCacheToView task
   std::shared_ptr<hh::AbstractTask<fl::internal::TileRequest<ViewType>,
                                    fl::internal::AdaptiveTileRequest<ViewType>>>
   copy() override {
     return std::make_shared<CopyLogicalCacheToView<ViewType>>(this->numberThreads(), this->numberChannels_);
   }
-
 };
 
 }

@@ -13,19 +13,22 @@ namespace fl {
 /// @brief FastLoader internal namespace
 namespace internal {
 
-template<class Viewtype>
+/// @brief Filter that test if an AdaptiveTileRequest needs to have data copied from a tile loader
+/// @tparam ViewType Type of the view
+template<class ViewType>
 class ToTileLoaderState :
-    public hh::AbstractState<fl::internal::TileRequest<Viewtype>, fl::internal::AdaptiveTileRequest<Viewtype>> {
+    public hh::AbstractState<fl::internal::TileRequest<ViewType>, fl::internal::AdaptiveTileRequest<ViewType>> {
  public:
+  /// @brief Default constructor
   ToTileLoaderState() = default;
+  /// @brief Default destructor
   virtual ~ToTileLoaderState() = default;
 
-  void execute(std::shared_ptr<fl::internal::AdaptiveTileRequest<Viewtype>> ptr) override {
+  /// @brief Execute method implementation form Hedgehog library
+  /// @param ptr AdaptiveTileRequest to test
+  void execute(std::shared_ptr<fl::internal::AdaptiveTileRequest<ViewType>> ptr) override {
     if (ptr->needCopyFromPhysicalTileLoader()) {
-//      global_mutex.lock();
-//      std::cout << "Transmitting Tile (" << ptr->indexRowLogicalTile() << ", " << ptr->indexColLogicalTile() << ", " << ptr->indexLayerLogicalTile() << ") #id" << ptr->id() << std::endl;
-//      global_mutex.unlock();
-      this->push(std::static_pointer_cast<fl::internal::TileRequest<Viewtype>>(ptr));
+      this->push(std::static_pointer_cast<fl::internal::TileRequest<ViewType>>(ptr));
     }
   }
 

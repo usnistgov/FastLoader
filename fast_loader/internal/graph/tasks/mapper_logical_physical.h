@@ -17,42 +17,57 @@ namespace fl {
 /// @brief FastLoader internal namespace
 namespace internal {
 
+/// @brief Mapper task create n AdaptiveTileRequest from the logical tile request.
+/// @tparam ViewType Type of the view.
 template<class ViewType>
 class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewType>, TileRequest<ViewType>> {
  private:
-  using DataType = typename ViewType::data_t;
+  using DataType = typename ViewType::data_t; ///< Sample type (AbstractView element type)
 
   std::shared_ptr<std::vector<size_t>> const
-      physicalTileHeights_ = std::make_shared<std::vector<size_t>>(),
-      physicalTileWidths_ = std::make_shared<std::vector<size_t>>(),
-      physicalTileDepths_ = std::make_shared<std::vector<size_t>>(),
-      logicalTileHeights_ = std::make_shared<std::vector<size_t>>(),
-      logicalTileWidths_ = std::make_shared<std::vector<size_t>>(),
-      logicalTileDepths_ = std::make_shared<std::vector<size_t>>(),
-      fullHeights_{},
-      fullWidths_{},
-      fullDepths_{},
-      numberLogicalTilesCache_ = std::make_shared<std::vector<size_t>>();
+      physicalTileHeights_ = std::make_shared<std::vector<size_t>>(), ///< Physical tile heights for all levels
+      physicalTileWidths_ = std::make_shared<std::vector<size_t>>(), ///< Physical tile widths for all levels
+      physicalTileDepths_ = std::make_shared<std::vector<size_t>>(), ///< Physical tile depths for all levels
+      logicalTileHeights_ = std::make_shared<std::vector<size_t>>(), ///< Logical tile heights for all levels
+      logicalTileWidths_ = std::make_shared<std::vector<size_t>>(), ///< Logical tile widths for all levels
+      logicalTileDepths_ = std::make_shared<std::vector<size_t>>(), ///< Logical tile depths for all levels
+      fullHeights_{}, ///< File heights for all levels
+      fullWidths_{}, ///< File depths for all levels
+      fullDepths_{}, ///< File depths for all levels
+      numberLogicalTilesCache_ = std::make_shared<std::vector<size_t>>(); ///< Number of logical tile cached per level
 
   size_t const
-      numberChannels_{};
+      numberChannels_{}; ///< Number of channels
 
   size_t
-      maxNumberLogicalTilesRow_ = 0,
-      maxNumberLogicalTilesCol_ = 0,
-      maxNumberLogicalTilesLayer_ = 0;
+      maxNumberLogicalTilesRow_ = 0, ///< Maximum of logical tile per row for the id calculation
+      maxNumberLogicalTilesCol_ = 0, ///< Maximum of logical tile per column for the id calculation
+      maxNumberLogicalTilesLayer_ = 0; ///< Maximum of logical tile per layer for the id calculation
 
   std::shared_ptr<std::vector<std::shared_ptr<internal::Cache<typename ViewType::data_t>>>>
-      logicalTileCaches_;
+      logicalTileCaches_; ///< All shared logical tile caches
 
   std::shared_ptr<internal::Cache<DataType>>
-      cache_ = {}; ///< Tile Cache
+      cache_ = {}; ///< Logical tile Cache
 
   size_t
-      numberElementDirectToCopy_ = 0,
-      numberElementsToTL_ = 0;
+      numberElementDirectToCopy_ = 0, ///< Counter of number AdaptiveTileRequest that have a cached tile ready
+      numberElementsToTL_ = 0; ///< Counter of number AdaptiveTileRequest that have an empty tile ready
 
  public:
+  /// @brief Mapper constructor
+  /// @param physicalTileHeights Number of physical tiles in height per level
+  /// @param physicalTileWidths Number of physical tiles in width per level
+  /// @param physicalTileDepths Number of physical tiles in depth per level
+  /// @param logicalTileHeights Logical tile height per level
+  /// @param logicalTileWidths Logical tile width per level
+  /// @param logicalTileDepths Logical tile depth per level
+  /// @param fullHeights File height per level
+  /// @param fullWidths File width per level
+  /// @param fullDepths File depth per level
+  /// @param numberLogicalTilesCaches Number of logical cached tiles per level
+  /// @param numberChannels Number of channels
+  /// @param logicalTileCaches Logical tile caches
   MapperLogicalPhysical(std::shared_ptr<std::vector<size_t>> physicalTileHeights,
                         std::shared_ptr<std::vector<size_t>> physicalTileWidths,
                         std::shared_ptr<std::vector<size_t>> physicalTileDepths,
@@ -96,10 +111,15 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
 
   }
 
+  /// @brief Default destructor
   virtual ~MapperLogicalPhysical() = default;
 
+  /// @brief Initialize method implementation from Hedgehog library
+  /// @details Set the cache for a specific pyramid level (=graphId)
   void initialize() override { cache_ = this->logicalTileCaches_->at(this->graphId()); }
 
+  /// @brief Execute method  implementation from Hedgehog library
+  /// @param tileRequest Logical Tile request to exploit
   void execute(std::shared_ptr<TileRequest<ViewType>> tileRequest) override {
     size_t const
         level = tileRequest->view()->level(),
@@ -241,6 +261,8 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
 
   }
 
+  /// @brief Extra printing information implementation from Hedgehog library
+  /// @return string containing extra printing information concerning cache properties
   [[nodiscard]] std::string extraPrintingInformation() const override {
     std::ostringstream oss;
     oss << "Miss rate: "
@@ -249,6 +271,8 @@ class MapperLogicalPhysical : public hh::AbstractTask<AdaptiveTileRequest<ViewTy
     return oss.str();
   }
 
+  /// @brief Copy implementation from Hedgehog library
+  /// @return Copy of a MapperLogicalPhysical
   std::shared_ptr<hh::AbstractTask<AdaptiveTileRequest<ViewType>, TileRequest<ViewType>>> copy() override {
     return std::make_shared<MapperLogicalPhysical<ViewType>>(
         this->physicalTileHeights_, this->physicalTileWidths_, this->physicalTileDepths_,
