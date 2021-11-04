@@ -453,21 +453,24 @@ class AbstractTileLoader : public hh::AbstractTask<internal::TileRequest<ViewTyp
   }
 
   /// @brief Print a duration with the good unit
-  /// @param duration Duration to print
+  /// @param ns Duration to print
   /// @return std::string with the duration and the unit
-  [[nodiscard]] std::string durationPrinter(uint64_t const duration) const {
+  static std::string durationPrinter(std::chrono::nanoseconds const &ns) {
     std::ostringstream oss;
-    uint64_t
-        s = (duration % 1000000000) / 1000000,
-        mS = (duration % 1000000) / 1000,
-        uS = (duration % 1000);
 
-    if (s > 0) {
-      oss << s << "." << std::setfill('0') << std::setw(3) << mS << "s";
-    } else if (mS > 0) {
-      oss << mS << "." << std::setfill('0') << std::setw(3) << uS << "ms";
+    // Cast with precision loss
+    auto s = std::chrono::duration_cast<std::chrono::seconds>(ns);
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(ns);
+    auto us = std::chrono::duration_cast<std::chrono::microseconds>(ns);
+
+    if (s > std::chrono::seconds::zero()) {
+      oss << s.count() << "." << std::setfill('0') << std::setw(3) << (ms - s).count() << "s";
+    } else if (ms > std::chrono::milliseconds::zero()) {
+      oss << ms.count() << "." << std::setfill('0') << std::setw(3) << (us - ms).count() << "ms";
+    } else if (us > std::chrono::microseconds::zero()) {
+      oss << us.count() << "." << std::setfill('0') << std::setw(3) << (ns - us).count() << "us";
     } else {
-      oss << duration << "us";
+      oss << std::setw(3) << ns.count() << "ns";
     }
     return oss.str();
   }

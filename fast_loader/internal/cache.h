@@ -63,10 +63,9 @@ class Cache {
       hit_;                   ///< Number of tile hit (tile get from the cache)
 
  private:
-  ///< Number of tile hit (tile get from the cache)
-  uint64_t
-      accessTime_,            ///< Time to get a tile from the cache (use for statistics)
-      recycleTime_;           ///< Time to release a tile from the cache (use for statistics)
+  std::chrono::nanoseconds
+      accessTime_ = std::chrono::nanoseconds::zero(), ///< Time to get a tile from the cache (use for statistics)
+      recycleTime_ = std::chrono::nanoseconds::zero(); ///< Time to release a tile from the cache (use for statistics)
 
  public:
 
@@ -142,10 +141,10 @@ class Cache {
 
   /// @brief Access time accessor
   /// @return Access time
-  uint64_t accessTime() const { return accessTime_; }
+  [[nodiscard]] std::chrono::nanoseconds const & accessTime() const { return accessTime_; }
   /// @brief Recycle time accessor
   /// @return Recycle time
-  uint64_t recycleTime() const { return recycleTime_; }
+  [[nodiscard]] std::chrono::nanoseconds const & recycleTime() const { return recycleTime_; }
 
   /// @brief Get a locked tile from the cache
   /// @param indexRow Locked tile's index row
@@ -174,7 +173,7 @@ class Cache {
       tile = newLockedTile(indexRow, indexCol, indexLayer);
     }
     auto end = std::chrono::system_clock::now();
-    accessTime_ += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    accessTime_ += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
     this->unlockCache();
 
     return tile;
@@ -210,12 +209,9 @@ class Cache {
     for (auto elem : cache.lru_)
       os << elem << " ";
     os << std::endl;
-    os << "timeGet: " << cache.accessTime_ << " / "
-       << "timeRelease: " << cache.recycleTime_ << " / "
-       << "nbTilesCache: " << cache.nbTilesCache_ << " / miss: " << cache.miss_
-       << " / hit: " << cache.hit_;
-    os << std::endl << "-------------------------------------------"
-       << std::endl;
+    os << "timeGet: " << cache.accessTime_.count() << " ns / timeRelease: " << cache.recycleTime_.count()
+    << " ns / nbTilesCache: " << cache.nbTilesCache_ << " / miss: " << cache.miss_ << " / hit: " << cache.hit_
+    << "\n-------------------------------------------\n";
     return os;
   }
 
@@ -244,16 +240,7 @@ class Cache {
 
     // Get LRU Tile
     toRecycle = lru_.back();
-    
-//    global_mutex.lock();
-//    std::cout << this << " Wait for tile to release: (" << toRecycle->indexRow() << ", " << toRecycle->indexCol() << ", " << toRecycle->indexLayer() << ")" << std::endl;
-//    global_mutex.unlock();
-    
     toRecycle->lock();
-    
-//    global_mutex.lock();
-//    std::cout << this << " Tile: (" << toRecycle->indexRow() << ", " << toRecycle->indexCol() << ", " << toRecycle->indexLayer() << ") released !" << std::endl;
-//    global_mutex.unlock();
     lru_.pop_back();
 
     // Clean The Tile
@@ -268,7 +255,7 @@ class Cache {
     pool_.push(toRecycle);
 
     auto end = std::chrono::system_clock::now();
-    recycleTime_ += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    recycleTime_ += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
     toRecycle->unlock();
   }

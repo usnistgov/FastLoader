@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(3dfastloader VERSION 2.1.4 LANGUAGES CXX)
+project(3dfastloader VERSION 2.2.0 LANGUAGES CXX)
 
 include(ExternalProject)
 
@@ -128,9 +128,9 @@ if (BUILD_MAIN)
 	set(CMAKE_CXX_FLAGS "${Hedgehog_CXX_FLAGS}")
 	# Add Compile flags
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-#	if (NOT MSVC)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -pedantic -fsanitize=address -fno-omit-frame-pointer")
-#	endif (NOT MSVC)
+	if (NOT MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -pedantic")
+	endif (NOT MSVC)
 
 	set(FL_SRC
 			fast_loader/api/default_view.h
@@ -148,16 +148,19 @@ if (BUILD_MAIN)
 
 			fast_loader/internal/data/cached_tile.h
 			fast_loader/internal/data/tile_request.h
+			fast_loader/internal/data/adaptive_tile_request.h
 
 			fast_loader/internal/data/volume/volume.h
 			fast_loader/internal/data/volume/copy_volume.h
 			fast_loader/internal/data/volume/copy_volume.h
 
 			fast_loader/internal/data/view/abstract_view.h
+			fast_loader/internal/data/view/adaptive_view.h
 
 			fast_loader/internal/data/view_data/default_view_data.h
 			fast_loader/internal/data/view_data/unified_view_data.h
 			fast_loader/internal/data/view_data/abstract_view_data.h
+			fast_loader/internal/data/view_data/adaptive_view_data.h
 
 			fast_loader/internal/border_creator/wrap_border_creator.h
 			fast_loader/internal/border_creator/reflect_border_creator.h
@@ -168,6 +171,12 @@ if (BUILD_MAIN)
 			fast_loader/internal/graph/tasks/view_loader.h
 			fast_loader/internal/graph/tasks/view_waiter.h
 			fast_loader/internal/graph/tasks/view_counter.h
+			fast_loader/internal/graph/tasks/mapper_logical_physical.h
+			fast_loader/internal/graph/tasks/copy_logical_tile_to_view.h
+
+			fast_loader/internal/graph/states/direct_to_copy_state.h
+			fast_loader/internal/graph/states/to_tile_loader_state.h
+			fast_loader/internal/graph/states/tile_loader_counter_state.h
 
 			fast_loader/internal/graph/fast_loader_execution_pipeline.h
 			fast_loader/internal/graph/memory_manager/fast_loader_memory_manager.h
@@ -177,7 +186,9 @@ if (BUILD_MAIN)
 			fast_loader/internal/traversal/hilbert_traversal.h
 			fast_loader/internal/traversal/diagonal_traversal.h
 			fast_loader/internal/traversal/block_recursive_traversal.h
-			fast_loader/api/adaptive_fast_loader_graph.h fast_loader/internal/graph/tasks/mapper_logical_physical.h fast_loader/internal/data/adaptive_tile_request.h fast_loader/internal/data/view/adaptive_view.h fast_loader/internal/data/view_data/adaptive_view_data.h fast_loader/internal/graph/states/direct_to_copy_state.h fast_loader/internal/graph/tasks/copy_logical_tile_to_view.h fast_loader/internal/graph/states/to_tile_loader_state.h fast_loader/internal/graph/states/tile_loader_counter_state.h)
+
+			fast_loader/api/adaptive_fast_loader_graph.h
+			)
 
 	if(TIFF_FOUND)
 		set(FL_SRC
