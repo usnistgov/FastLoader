@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/13/19.
-//
 
-#ifndef FASTLOADER_CONSTANT_BORDER_CREATOR_H
-#define FASTLOADER_CONSTANT_BORDER_CREATOR_H
+#ifndef FAST_LOADER_CONSTANT_BORDER_CREATOR_H
+#define FAST_LOADER_CONSTANT_BORDER_CREATOR_H
 
 #include "../../api/abstract_border_creator.h"
 /// @brief FastLoader namespace
@@ -140,4 +137,4 @@ class ConstantBorderCreator : public AbstractBorderCreator<ViewType> {
 };
 }
 }
-#endif //FASTLOADER_CONSTANT_BORDER_CREATOR_H
+#endif //FAST_LOADER_CONSTANT_BORDER_CREATOR_H

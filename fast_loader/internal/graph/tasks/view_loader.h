@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/8/19.
-//
 
-#ifndef FASTLOADER_VIEW_LOADER_H
-#define FASTLOADER_VIEW_LOADER_H
+#ifndef FAST_LOADER_VIEW_LOADER_H
+#define FAST_LOADER_VIEW_LOADER_H
 
 #include "../../../api/abstract_border_creator.h"
 #include "../../data/view_data/abstract_view_data.h"
@@ -149,4 +146,4 @@ class ViewLoader : public hh::AbstractTask<TileRequest<ViewType>, ViewDataType> 
 };
 }
 }
-#endif //FASTLOADER_VIEW_LOADER_H
+#endif //FAST_LOADER_VIEW_LOADER_H

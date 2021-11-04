@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by Bardakoff, Alexandre (IntlAssoc) on 9/23/20.
-//
 
-#ifndef FASTLOADER_DEFAULT_VIEW_H
-#define FASTLOADER_DEFAULT_VIEW_H
+#ifndef FAST_LOADER_DEFAULT_VIEW_H
+#define FAST_LOADER_DEFAULT_VIEW_H
 
 #include "../internal/data/view/abstract_view.h"
 #include "../internal/data/view_data/default_view_data.h"
@@ -70,4 +67,4 @@ class DefaultView : public internal::AbstractView<DataType> {
 
 }
 
-#endif //FASTLOADER_DEFAULT_VIEW_H
+#endif //FAST_LOADER_DEFAULT_VIEW_H

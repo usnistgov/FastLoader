@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 2/13/20.
-//
 
-#ifndef FASTLOADER_DIAGONAL_traversalH
-#define FASTLOADER_DIAGONAL_traversalH
+#ifndef FAST_LOADER_DIAGONAL_traversalH
+#define FAST_LOADER_DIAGONAL_traversalH
 // TODO: Update for 3D
 //#include "../../api/abstract_traversal.h"
 ///// @brief FastLoader namespace
@@ -94,4 +91,4 @@
 //};
 //}
 //}
-#endif //FASTLOADER_DIAGONAL_traversalH
+#endif //FAST_LOADER_DIAGONAL_traversalH

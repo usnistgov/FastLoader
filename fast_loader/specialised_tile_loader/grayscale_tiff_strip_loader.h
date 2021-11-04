@@ -16,8 +16,8 @@
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
 
-#ifndef FASTLOADER_GRAYSCALE_TIFF_STRIP_LOADER_H
-#define FASTLOADER_GRAYSCALE_TIFF_STRIP_LOADER_H
+#ifndef FAST_LOADER_GRAYSCALE_TIFF_STRIP_LOADER_H
+#define FAST_LOADER_GRAYSCALE_TIFF_STRIP_LOADER_H
 #include "../fast_loader.h"
 
 #ifdef __APPLE__
@@ -253,4 +253,4 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
 
 };
 
-#endif //FASTLOADER_GRAYSCALE_TIFF_STRIP_LOADER_H
+#endif //FAST_LOADER_GRAYSCALE_TIFF_STRIP_LOADER_H

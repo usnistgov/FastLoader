@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/8/19.
-//
 
-#ifndef FASTLOADER_TILE_REQUEST_H
-#define FASTLOADER_TILE_REQUEST_H
+#ifndef FAST_LOADER_TILE_REQUEST_H
+#define FAST_LOADER_TILE_REQUEST_H
 
 #include <cstdint>
 #include <memory>
@@ -28,6 +25,7 @@
 #include <ostream>
 #include <algorithm>
 #include <iostream>
+#include <list>
 #include "volume/copy_volume.h"
 /// @brief FastLoader namespace
 namespace fl {
@@ -133,4 +131,4 @@ class TileRequest {
 };
 }
 }
-#endif //FASTLOADER_TILE_REQUEST_H
+#endif //FAST_LOADER_TILE_REQUEST_H

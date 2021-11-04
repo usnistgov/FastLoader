@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/18/19.
-//
 
-#ifndef FASTLOADER_FAST_LOADER_CONFIGURATION_H
-#define FASTLOADER_FAST_LOADER_CONFIGURATION_H
+#ifndef FAST_LOADER_FAST_LOADER_CONFIGURATION_H
+#define FAST_LOADER_FAST_LOADER_CONFIGURATION_H
 
 #include "../api/abstract_tile_loader.h"
 
@@ -332,4 +329,4 @@ class FastLoaderConfiguration {
   }
 };
 }
-#endif //FASTLOADER_FAST_LOADER_CONFIGURATION_H
+#endif //FAST_LOADER_FAST_LOADER_CONFIGURATION_H

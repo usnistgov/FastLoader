@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/8/19.
-//
 
-#ifndef FASTLOADER_FAST_LOADER_GRAPH_H
-#define FASTLOADER_FAST_LOADER_GRAPH_H
+#ifndef FAST_LOADER_FAST_LOADER_GRAPH_H
+#define FAST_LOADER_FAST_LOADER_GRAPH_H
 
 #include <hedgehog/hedgehog.h>
 #include "fast_loader_configuration.h"
@@ -411,4 +408,4 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
 };
 
 }
-#endif //FASTLOADER_FAST_LOADER_GRAPH_H
+#endif //FAST_LOADER_FAST_LOADER_GRAPH_H

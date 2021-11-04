@@ -15,17 +15,21 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-#ifndef FASTLOADER_FASTLOADER_H
-#define FASTLOADER_FASTLOADER_H
 
+#ifndef FAST_LOADER_FAST_LOADER_H
+#define FAST_LOADER_FAST_LOADER_H
+
+#include "api/abstract_adaptive_tile_loader.h"
+#include "api/abstract_border_creator.h"
+#include "api/abstract_tile_loader.h"
+#include "api/abstract_traversal.h"
+#include "api/adaptive_fast_loader_graph.h"
 #include "api/default_view.h"
+#include "api/fast_loader_configuration.h"
+#include "api/fast_loader_graph.h"
+#include "api/index_request.h"
 #ifdef HH_USE_CUDA
 #include "api/unified_view.h"
 #endif //HH_USE_CUDA
-#include "api/adaptive_fast_loader_graph.h"
-#include "api/fast_loader_graph.h"
-#include "api/fast_loader_configuration.h"
-#include "api/abstract_adaptive_tile_loader.h"
-#include "api/abstract_border_creator.h"
 
-#endif //FASTLOADER_FASTLOADER_H
+#endif //FAST_LOADER_FAST_LOADER_H

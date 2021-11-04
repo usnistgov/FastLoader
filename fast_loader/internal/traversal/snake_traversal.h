@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 2/13/20.
-//
 
-#ifndef FASTLOADER_SNAKE_TRAVERSAL_H
-#define FASTLOADER_SNAKE_TRAVERSAL_H
+#ifndef FAST_LOADER_SNAKE_TRAVERSAL_H
+#define FAST_LOADER_SNAKE_TRAVERSAL_H
 
 #include "../../api/abstract_traversal.h"
 
@@ -53,4 +50,4 @@
 //};
 //}
 //}
-#endif //FASTLOADER_SNAKE_TRAVERSAL_H
+#endif //FAST_LOADER_SNAKE_TRAVERSAL_H

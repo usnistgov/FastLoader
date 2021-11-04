@@ -15,15 +15,15 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/8/19.
-//
 
-#ifndef FASTLOADER_TRAITS_H
-#define FASTLOADER_TRAITS_H
+#ifndef FAST_LOADER_TRAITS_H
+#define FAST_LOADER_TRAITS_H
 
 #include <type_traits>
+
 #include "data/view/abstract_view.h"
+#include "../api/default_view.h"
+
 /// @brief FastLoader namespace
 namespace fl {
 /// @brief FastLoader internal namespace
@@ -50,15 +50,15 @@ struct IsView {
       (
           std::is_base_of_v<AbstractView < typename ViewType::data_t>, ViewType > &&
 #ifdef HH_USE_CUDA
-          std::disjunction_v<
-          std::is_base_of<DefaultView < typename ViewType::data_t>, ViewType >,
-          std::is_base_of<UnifiedView < typename ViewType::data_t>, ViewType >> &&
+              std::disjunction_v<
+              std::is_base_of<DefaultView < typename ViewType::data_t>, ViewType >,
+              std::is_base_of<UnifiedView < typename ViewType::data_t>, ViewType >> &&
 #else //HH_USE_CUDA
-          std::is_base_of_v<DefaultView < typename ViewType::data_t>, ViewType > &&
+              std::is_base_of_v<DefaultView < typename ViewType::data_t>, ViewType > &&
 #endif
-          std::is_arithmetic_v<typename ViewType::data_t>); ///< Test's value
-
+              std::is_arithmetic_v<typename ViewType::data_t>); ///< Test's value
 };
+
 /// @brief Helper to access value of the IsView trait
 /// @tparam ViewType Type to test
 template<class ViewType>
@@ -66,4 +66,4 @@ inline constexpr bool is_view_v = IsView<ViewType>::value;
 }
 }
 }
-#endif //FASTLOADER_TRAITS_H
+#endif //FAST_LOADER_TRAITS_H

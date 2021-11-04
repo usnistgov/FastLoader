@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/15/19.
-//
 
-#ifndef FASTLOADER_FAST_LOADER_EXECUTION_PIPELINE_H
-#define FASTLOADER_FAST_LOADER_EXECUTION_PIPELINE_H
+#ifndef FAST_LOADER_FAST_LOADER_EXECUTION_PIPELINE_H
+#define FAST_LOADER_FAST_LOADER_EXECUTION_PIPELINE_H
 
 #include <hedgehog/hedgehog.h>
 #include "../../api/index_request.h"
@@ -54,4 +51,4 @@ class FastLoaderExecutionPipeline : public hh::AbstractExecutionPipeline<TileReq
 };
 }
 }
-#endif //FASTLOADER_FAST_LOADER_EXECUTION_PIPELINE_H
+#endif //FAST_LOADER_FAST_LOADER_EXECUTION_PIPELINE_H

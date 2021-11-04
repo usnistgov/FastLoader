@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(3dfastloader VERSION 2.2.0 LANGUAGES CXX)
+project(FastLoader VERSION 2.2.0 LANGUAGES CXX)
 
 include(ExternalProject)
 

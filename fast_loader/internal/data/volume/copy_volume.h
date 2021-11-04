@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by Bardakoff, Alexandre (IntlAssoc) on 10/15/20.
-//
 
-#ifndef INC_3DFASTLOADER_COPY_VOLUME_H
-#define INC_3DFASTLOADER_COPY_VOLUME_H
+#ifndef INC_FAST_LOADER_COPY_VOLUME_H
+#define INC_FAST_LOADER_COPY_VOLUME_H
 #include "volume.h"
 /// @brief FastLoader namespace
 namespace fl {
@@ -106,4 +103,4 @@ class CopyVolume {
 };
 }
 }
-#endif //INC_3DFASTLOADER_COPY_VOLUME_H
+#endif //INC_FAST_LOADER_COPY_VOLUME_H

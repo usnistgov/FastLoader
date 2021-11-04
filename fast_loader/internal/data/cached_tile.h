@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/8/19.
-//
 
-#ifndef FASTLOADER_CACHED_TILE_H
-#define FASTLOADER_CACHED_TILE_H
+#ifndef FAST_LOADER_CACHED_TILE_H
+#define FAST_LOADER_CACHED_TILE_H
 
 #include <cstdint>
 #include <iostream>
@@ -163,4 +160,4 @@ class CachedTile {
 };
 }
 }
-#endif //FASTLOADER_CACHED_TILE_H
+#endif //FAST_LOADER_CACHED_TILE_H

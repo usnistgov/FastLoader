@@ -15,12 +15,10 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by Bardakoff, Alexandre (IntlAssoc) on 9/23/20.
-//
 
-#ifndef FASTLOADER_UNIFIED_VIEW_DATA_H
-#define FASTLOADER_UNIFIED_VIEW_DATA_H
+
+#ifndef FAST_LOADER_UNIFIED_VIEW_DATA_H
+#define FAST_LOADER_UNIFIED_VIEW_DATA_H
 
 #ifdef HH_USE_CUDA
 
@@ -141,4 +139,4 @@ checkCudaErrors(cudaMallocManaged((void **) &this->data_, sizeof(DataType) * vie
 }
 
 #endif // HH_USE_CUDA
-#endif //FASTLOADER_UNIFIED_VIEW_DATA_H
+#endif //FAST_LOADER_UNIFIED_VIEW_DATA_H

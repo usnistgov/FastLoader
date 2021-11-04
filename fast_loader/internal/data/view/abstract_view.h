@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on /8/9.
-//
 
-#ifndef FASTLOADER_ABSTRACT_VIEW_H
-#define FASTLOADER_ABSTRACT_VIEW_H
+#ifndef FAST_LOADER_ABSTRACT_VIEW_H
+#define FAST_LOADER_ABSTRACT_VIEW_H
 
 #include "../../graph/tasks/view_loader.h"
 
@@ -591,4 +588,4 @@ class AbstractView {
 };
 }
 }
-#endif //FASTLOADER_ABSTRACT_VIEW_H
+#endif //FAST_LOADER_ABSTRACT_VIEW_H

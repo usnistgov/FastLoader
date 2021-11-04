@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by Bardakoff, Alexandre (IntlAssoc) on 9/23/20.
-//
 
-#ifndef FASTLOADER_UNIFIED_VIEW_H
-#define FASTLOADER_UNIFIED_VIEW_H
+#ifndef FAST_LOADER_UNIFIED_VIEW_H
+#define FAST_LOADER_UNIFIED_VIEW_H
 
 #ifdef HH_USE_CUDA
 #include "../internal/data/view/abstract_view.h"
@@ -75,4 +72,4 @@ template<class DataType>
 
 #endif // HH_USE_CUDA
 
-#endif //FASTLOADER_UNIFIED_VIEW_H
+#endif //FAST_LOADER_UNIFIED_VIEW_H

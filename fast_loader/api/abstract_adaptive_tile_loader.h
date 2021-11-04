@@ -15,12 +15,10 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by Bardakoff, Alexandre (IntlAssoc) on 10/23/20.
-//
 
-#ifndef INC_3DFASTLOADER_ABSTRACT_ADAPTIVE_TILE_LOADER_H
-#define INC_3DFASTLOADER_ABSTRACT_ADAPTIVE_TILE_LOADER_H
+
+#ifndef INC_FAST_LOADER_ABSTRACT_ADAPTIVE_TILE_LOADER_H
+#define INC_FAST_LOADER_ABSTRACT_ADAPTIVE_TILE_LOADER_H
 
 #include <utility>
 
@@ -357,4 +355,4 @@ class AbstractAdaptiveTileLoader : public AbstractTileLoader<ViewType> {
   }
 };
 }
-#endif //INC_3DFASTLOADER_ABSTRACT_ADAPTIVE_TILE_LOADER_H
+#endif //INC_FAST_LOADER_ABSTRACT_ADAPTIVE_TILE_LOADER_H

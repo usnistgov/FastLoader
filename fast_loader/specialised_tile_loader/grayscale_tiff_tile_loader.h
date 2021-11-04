@@ -15,12 +15,9 @@
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by anb22 on 11/22/19.
-//
 
-#ifndef FASTLOADER_GRAYSCALE_TIFF_TILE_LOADER_H
-#define FASTLOADER_GRAYSCALE_TIFF_TILE_LOADER_H
+#ifndef FAST_LOADER_GRAYSCALE_TIFF_TILE_LOADER_H
+#define FAST_LOADER_GRAYSCALE_TIFF_TILE_LOADER_H
 #include "../fast_loader.h"
 
 #ifdef __APPLE__
@@ -203,4 +200,4 @@ template<class DataType>
 
 };
 
-#endif //FASTLOADER_GRAYSCALE_TIFF_TILE_LOADER_H
+#endif //FAST_LOADER_GRAYSCALE_TIFF_TILE_LOADER_H
