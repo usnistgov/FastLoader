@@ -377,7 +377,7 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
     for (auto indexRequest: generateIndexRequestForAllViews(level)) { this->pushData(indexRequest); }
   }
 
- private:
+// private:
   /// @brief Request a AbstractView for a level, can be used when the FastLoaderGraph is embedded into another graph to generate
   /// easily FastImageGraph inputs
   /// @param rowIndex AbstractView's row requested
