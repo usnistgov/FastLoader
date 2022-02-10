@@ -109,7 +109,7 @@ class GrayscaleTiffStripLoader : public fl::AbstractTileLoader<fl::DefaultView<D
                         [[maybe_unused]] size_t level) override {
 
     tdata_t buf;
-    uint32 row, layer;
+    uint32_t row, layer;
 
     buf = _TIFFmalloc(TIFFScanlineSize(tiff_));
 
