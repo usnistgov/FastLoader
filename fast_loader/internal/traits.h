@@ -23,6 +23,7 @@
 
 #include "data/view/abstract_view.h"
 #include "../api/default_view.h"
+#include "../api/unified_view.h"
 
 /// @brief FastLoader namespace
 namespace fl {
