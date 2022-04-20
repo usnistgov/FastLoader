@@ -213,9 +213,9 @@ class FastLoaderGraph : public hh::Graph<ViewType, IndexRequest> {
 
         auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
             viewCounter, configurations_->ordered_,
-            fullHeightPerLevel, fullWidthPerLevel, fullDepthPerLevel,
-            tileHeightPerLevel, tileWidthPerLevel, tileDepthPerLevel,
-            numberChannels,
+            fullHeightPerLevel_, fullWidthPerLevel_, fullDepthPerLevel_,
+            tileHeightPerLevel_, tileWidthPerLevel_, tileDepthPerLevel_,
+            numberChannels_,
             configurations_->radiusHeight_, configurations_->radiusWidth_, configurations_->radiusDepth_,
             configurations_->fillingType_);
 
