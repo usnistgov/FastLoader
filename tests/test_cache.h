@@ -11,109 +11,115 @@
 // THEREOF, INCLUDING BUT NOT LIMITED TO THE CORRECTNESS, ACCURACY, RELIABILITY, OR USEFULNESS OF THE SOFTWARE. You
 // are solely responsible for determining the appropriateness of using and distributing the software and you assume
 // all risks associated with its use, including but not limited to the risks and costs of program errors, compliance
-// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of 
+// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
-//
-// Created by Bardakoff, Alexandre (IntlAssoc) on 10/28/20.
-//
 
-#ifndef INC_3DFASTLOADER_TEST_CACHE_H
-#define INC_3DFASTLOADER_TEST_CACHE_H
+#ifndef FAST_LOADER_TEST_CACHE_H
+#define FAST_LOADER_TEST_CACHE_H
 
 #include <gtest/gtest.h>
 #include <cmath>
-#include "../fast_loader/internal/cache.h"
+#include <utility>
+#include "../fast_loader/core/cache.h"
 
-void cacheInitialization(size_t numTileCache,
-                         size_t numTilesHeight, size_t numTilesWidth, size_t numTilesDepth,
-                         size_t tileHeight, size_t tileWidth, size_t tileDepth, size_t numberChannels) {
-  fl::internal::Cache<int> cache(
-      numTileCache, numTilesHeight, numTilesWidth, numTilesDepth, tileHeight, tileWidth, tileDepth, numberChannels);
+void cacheInitialization(std::vector<size_t> const &cacheDimension,
+                         size_t nbTilesCache,
+                         std::vector<size_t> const &tileDimension) {
+  fl::internal::Cache<int> cache(cacheDimension, nbTilesCache, tileDimension);
   ASSERT_EQ(cache.hit(), (size_t) 0);
   ASSERT_EQ(cache.miss(), (size_t) 0);
-  if (numTileCache == 0) { numTileCache = 2 * numTilesWidth; }
-  if (numTilesHeight * numTilesWidth * numTilesDepth < numTileCache) {
-    ASSERT_EQ(cache.nbTilesCache(), numTilesHeight * numTilesWidth * numTilesDepth);
-  } else {
-    ASSERT_EQ(cache.nbTilesCache(), numTileCache);
-  }
+  if (nbTilesCache == 0) { nbTilesCache = 18; }
+
+  size_t productDimension = std::accumulate(cacheDimension.begin(), cacheDimension.end(), (size_t) 1, std::multiplies<>());
+
+  if (productDimension < nbTilesCache) { ASSERT_EQ(cache.nbTilesCache(), productDimension); }
+  else { ASSERT_EQ(cache.nbTilesCache(), nbTilesCache); }
+
   ASSERT_EQ(cache.nbTilesCache(), cache.pool().size());
-  auto const & mapCache = cache.mapCache();
-  for (size_t layer = 0; layer < numTilesDepth; ++layer) {
-    for (size_t row = 0; row < numTilesHeight; ++row) {
-      for (size_t col = 0; col < numTilesWidth; ++col) {
-        ASSERT_TRUE(mapCache.at(layer).at(row).at(col).get() == nullptr);
-      }
-    }
-  }
+  auto const &mapCache = cache.mapCache();
+
+  ASSERT_TRUE(std::all_of(mapCache.cbegin(), mapCache.cend(), [](auto const &elem) { return elem == nullptr; }));
   ASSERT_EQ(cache.lru().size(), (size_t) 0);
 }
 
-void getNewTiles(size_t numTileCache,
-                 size_t numTilesHeight, size_t numTilesWidth, size_t numTilesDepth,
-                 size_t tileHeight, size_t tileWidth, size_t tileDepth, size_t numberChannels) {
+void getNewTiles(std::vector<size_t> const &cacheDimension, size_t nbTilesCache, std::vector<size_t> const &tileDimension) {
   std::shared_ptr<fl::internal::CachedTile<int>> tile = nullptr;
-  fl::internal::Cache<int> cache(
-      numTileCache,
-      numTilesHeight, numTilesWidth, numTilesDepth,
-      tileHeight, tileWidth, tileDepth, numberChannels);
+  fl::internal::Cache<int> cache(cacheDimension, nbTilesCache, tileDimension);
 
-  size_t
-      nbTilesCache = cache.nbTilesCache();
+  nbTilesCache = cache.nbTilesCache();
+  std::vector<size_t> testIndex;
 
-  ASSERT_THROW(cache.lockedTile(numTilesHeight + 1, 0, 0), std::runtime_error);
-  ASSERT_THROW(cache.lockedTile(numTilesHeight + 1, numTilesWidth + 1, 0), std::runtime_error);
-  ASSERT_THROW(cache.lockedTile(0, numTilesWidth + 1, 0), std::runtime_error);
-  ASSERT_THROW(cache.lockedTile(numTilesHeight + 1, 0, numTilesDepth + 1), std::runtime_error);
-  ASSERT_THROW(cache.lockedTile(numTilesHeight + 1, numTilesWidth + 1, numTilesDepth + 1), std::runtime_error);
-  ASSERT_THROW(cache.lockedTile(0, numTilesWidth + 1, numTilesDepth + 1), std::runtime_error);
-
-  tile = cache.lockedTile(0, 0, 0);
-  ASSERT_EQ(tile->isNewTile(), true);
-  tile->newTile(false);
-  tile->unlock();
-  ASSERT_EQ(cache.pool().size(), nbTilesCache - 1);
-  ASSERT_EQ(cache.lru().front().get(), (cache.mapCache().at(0).at(0).at(0).get()));
-
-  tile = cache.lockedTile(0, 0, 0);
-  ASSERT_EQ(tile->isNewTile(), false);
-  tile->unlock();
-  ASSERT_EQ(cache.pool().size(), nbTilesCache - 1);
-  ASSERT_EQ(cache.lru().front().get(), (cache.mapCache().at(0).at(0).at(0).get()));
-
-  tile = cache.lockedTile(numTilesHeight - 1, numTilesWidth - 1, numTilesDepth - 1);
-  ASSERT_EQ(tile->isNewTile(), true);
-  tile->unlock();
-
-  ASSERT_EQ(cache.pool().size(),
-            (size_t) std::max((int32_t) nbTilesCache - 2, (int32_t) 0));
-  ASSERT_EQ(cache.lru().front().get(),
-            (cache.mapCache().at(numTilesDepth - 1).at(numTilesHeight - 1).at(numTilesWidth - 1).get()));
-
-  size_t
-      twoDGridSize = numTilesWidth * numTilesHeight,
-      indexLayer = 0,
-      indexRow = 0,
-      indexColumn = 0;
-  for (size_t alreadyUsedTiles = 1; alreadyUsedTiles < nbTilesCache; ++alreadyUsedTiles) {
-    indexLayer = alreadyUsedTiles / twoDGridSize;
-    indexRow = (alreadyUsedTiles % twoDGridSize) / numTilesWidth;
-    indexColumn = (alreadyUsedTiles % twoDGridSize) % numTilesWidth;
-
-    tile = cache.lockedTile(indexRow, indexColumn, indexLayer);
-    ASSERT_EQ(tile->isNewTile(), true);
-    tile->newTile(false);
-    tile->unlock();
+  for (size_t dimension = 0; dimension < cacheDimension.size(); ++dimension) {
+    testIndex = cacheDimension;
+    std::transform(testIndex.cbegin(), testIndex.cend(), testIndex.begin(), [](auto const &elem) { return elem - 1; });
+    ++(testIndex.at(dimension));
+    ASSERT_THROW(cache.lockedTile(testIndex), std::runtime_error);
   }
 
-  ASSERT_EQ(cache.pool().size(), (size_t) 0);
-  tile = cache.lockedTile(0, 0, 0);
-  ASSERT_EQ(tile->isNewTile(), nbTilesCache != numTilesHeight * numTilesWidth * numTilesDepth);
+
+  tile = cache.lockedTile(std::vector<size_t>(cacheDimension.size()));
+  ASSERT_EQ(tile->newTile(), true);
   tile->newTile(false);
   tile->unlock();
-  ASSERT_EQ(cache.pool().size(), (size_t) 0);
-  ASSERT_EQ(cache.lru().front().get(), (cache.mapCache().at(0).at(0).at(0).get()));
+  ASSERT_EQ(cache.pool().size(), nbTilesCache - 1);
+  ASSERT_EQ(cache.lru().front().get(), (cache.mapCache().at(0).get()));
+
+  tile = cache.lockedTile(std::vector<size_t>(cacheDimension.size()));
+  ASSERT_EQ(tile->newTile(), false);
+  tile->unlock();
+  ASSERT_EQ(cache.pool().size(), nbTilesCache - 1);
+  ASSERT_EQ(cache.lru().front().get(), (cache.mapCache().at(0).get()));
+
+
+  ASSERT_EQ(tile->newTile(), true);
+  tile->unlock();
+
+  ASSERT_EQ(cache.pool().size(), (size_t) std::max((int32_t) nbTilesCache - 2, (int32_t) 0));
+  ASSERT_EQ(cache.lru().front().get(), (cache.mapCache().at(
+      std::inner_product(
+          testIndex.cbegin(), testIndex.cend(), cacheDimension.cbegin(),
+          (size_t) 1, std::plus<>(), std::multiplies<>())
+      ).get()));
 }
-#endif //INC_3DFASTLOADER_TEST_CACHE_H
+
+void testCache(){
+  std::vector<size_t>
+      numberDimensions{1, 3, 5, 7},
+      numberTilesToCache{0, 1, 10},
+      numberTiles{5, 10};
+
+  std::random_device rd;
+  std::uniform_int_distribution<size_t> distribution(1, 20);
+  auto gen = [&distribution, &rd](){ return distribution(rd); };
+
+  std::vector<size_t> tileSize;
+
+  for (auto const &numberDimension : numberDimensions) {
+    tileSize.clear();
+    tileSize.resize(numberDimension);
+    for (auto const &numberTile : numberTiles) {
+      for (auto const &numberTileToCache : numberTilesToCache) {
+        std::generate(tileSize.begin(), tileSize.end(), gen);
+
+        ASSERT_NO_FATAL_FAILURE(
+            cacheInitialization(
+                std::vector<size_t>(numberDimension, numberTile),
+                numberTileToCache,
+                tileSize
+            )
+        );
+        ASSERT_NO_FATAL_FAILURE(
+            cacheInitialization(
+                std::vector<size_t>(numberDimension, numberTile),
+                numberTileToCache,
+                tileSize
+            )
+        );
+      }
+    }
+  }
+}
+
+#endif //FAST_LOADER_TEST_CACHE_H

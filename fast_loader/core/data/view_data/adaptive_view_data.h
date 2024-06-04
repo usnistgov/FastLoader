@@ -11,24 +11,50 @@
 // THEREOF, INCLUDING BUT NOT LIMITED TO THE CORRECTNESS, ACCURACY, RELIABILITY, OR USEFULNESS OF THE SOFTWARE. You
 // are solely responsible for determining the appropriateness of using and distributing the software and you assume
 // all risks associated with its use, including but not limited to the risks and costs of program errors, compliance
-// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of 
+// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
 
-#ifndef FAST_LOADER_FAST_LOADER_H
-#define FAST_LOADER_FAST_LOADER_H
+#ifndef FAST_LOADER_ADAPTIVE_VIEW_DATA_H
+#define FAST_LOADER_ADAPTIVE_VIEW_DATA_H
 
-#include "api/graph/options/abstract_border_creator.h"
-#include "api/graph/abstract_tile_loader.h"
-#include "api/graph/options/abstract_traversal.h"
-#include "api/graph/adaptive/adaptive_fast_loader_graph.h"
-#include "api/view/default_view.h"
-#include "api/graph/fast_loader_configuration.h"
-#include "api/graph/fast_loader_graph.h"
-#include "api/data/index_request.h"
-#ifdef HH_USE_CUDA
-#include "api/view/unified_view.h"
-#endif //HH_USE_CUDA
+#include <stdexcept>
+#include "abstract_view_data.h"
 
-#endif //FAST_LOADER_FAST_LOADER_H
+/// @brief FastLoader namespace
+namespace fl {
+/// @brief FastLoader internal namespace
+namespace internal {
+
+/// @brief Data used by an AdaptiveView using a logical cached tile as data.
+/// @tparam DataType Type of data inside the View
+template<class DataType>
+class AdaptiveViewData : public AbstractViewData<DataType>{
+ private:
+  DataType * const
+      dataOrigin_; ///< Origin of the logical cached tile data
+ public:
+  /// @brief AdaptiveViewData constructor accepting the origin of the logical cached tile data
+  /// @param dataOrigin Origin of the logical cached tile data
+  explicit AdaptiveViewData(DataType *const dataOrigin) : dataOrigin_(dataOrigin) {}
+
+  /// @brief Default destructor
+  ~AdaptiveViewData() override = default;
+
+  /// @brief Data accessor
+  /// @return Origin of the logical cached tile data
+  DataType *data() const final { return dataOrigin_;}
+
+  /// @brief returnToMemoryManager implementation from Hedgehog library, throw an exception in every case
+  /// @warning Should not be used because data is a piece of cache and not an Hedgehog managed memory
+  /// @throw std::runtime_error in every case, should not be used
+  void returnToMemoryManager() final {
+    throw std::runtime_error("An Adaptive view is an internal view not made to be used with a memory manager.");
+  }
+};
+
+} // internal
+} // fl
+
+#endif //FAST_LOADER_ADAPTIVE_VIEW_DATA_H

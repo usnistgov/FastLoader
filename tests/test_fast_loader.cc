@@ -11,24 +11,45 @@
 // THEREOF, INCLUDING BUT NOT LIMITED TO THE CORRECTNESS, ACCURACY, RELIABILITY, OR USEFULNESS OF THE SOFTWARE. You
 // are solely responsible for determining the appropriateness of using and distributing the software and you assume
 // all risks associated with its use, including but not limited to the risks and costs of program errors, compliance
-// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of 
+// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
 
-#ifndef FAST_LOADER_FAST_LOADER_H
-#define FAST_LOADER_FAST_LOADER_H
 
-#include "api/graph/options/abstract_border_creator.h"
-#include "api/graph/abstract_tile_loader.h"
-#include "api/graph/options/abstract_traversal.h"
-#include "api/graph/adaptive/adaptive_fast_loader_graph.h"
-#include "api/view/default_view.h"
-#include "api/graph/fast_loader_configuration.h"
-#include "api/graph/fast_loader_graph.h"
-#include "api/data/index_request.h"
-#ifdef HH_USE_CUDA
-#include "api/view/unified_view.h"
-#endif //HH_USE_CUDA
+#include <random>
+#include "test_cache.h"
+#include "test_requests.h"
+#include "test_adaptive.h"
+#include "test_tile_loader.h"
 
-#endif //FAST_LOADER_FAST_LOADER_H
+TEST(TEST_FL, TEST_CACHE) {
+  ASSERT_NO_THROW(testCache());
+}
+
+TEST(TEST_FL, TEST_FAIL_TL){
+  ASSERT_THROW(testFastLoaderCustom(0, {1, 1, 1}, {1, 1, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {0, 0, 0}, {1, 1, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {0, 1, 1}, {1, 1, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {1, 0, 1}, {1, 1, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {1, 1, 0}, {1, 1, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {1, 1, 1},  {0, 0, 0}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {1, 1, 1},  {0, 1, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {1, 1, 1},  {1, 0, 1}), std::runtime_error);
+  ASSERT_THROW(testFastLoaderCustom(1, {1, 1, 1},  {1, 1, 0}), std::runtime_error);
+}
+
+TEST(TEST_FL, TEST_REQUEST) {
+  ASSERT_NO_THROW(basicRequest());
+  ASSERT_NO_THROW(testOrdering());
+  ASSERT_NO_THROW(testFillingConstant());
+}
+
+TEST(TEST_FL, TEST_BASE){
+  ASSERT_NO_THROW(testBasicFastLoader());
+  ASSERT_NO_THROW(testViewWithRadiusConstant());
+}
+
+TEST(TEST_FL, TEST_ADAPTIVE){
+  ASSERT_NO_THROW(testAdaptiveFL());
+}

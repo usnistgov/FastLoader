@@ -11,24 +11,47 @@
 // THEREOF, INCLUDING BUT NOT LIMITED TO THE CORRECTNESS, ACCURACY, RELIABILITY, OR USEFULNESS OF THE SOFTWARE. You
 // are solely responsible for determining the appropriateness of using and distributing the software and you assume
 // all risks associated with its use, including but not limited to the risks and costs of program errors, compliance
-// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of 
+// with applicable laws, damage to or loss of data, programs or equipment, and the unavailability or interruption of
 // operation. This software is not intended to be used in any situation where a failure could cause risk of injury or
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
 
-#ifndef FAST_LOADER_FAST_LOADER_H
-#define FAST_LOADER_FAST_LOADER_H
+#ifndef FAST_LOADER_DEFAULT_BORDER_CREATOR_H
+#define FAST_LOADER_DEFAULT_BORDER_CREATOR_H
 
-#include "api/graph/options/abstract_border_creator.h"
-#include "api/graph/abstract_tile_loader.h"
-#include "api/graph/options/abstract_traversal.h"
-#include "api/graph/adaptive/adaptive_fast_loader_graph.h"
-#include "api/view/default_view.h"
-#include "api/graph/fast_loader_configuration.h"
-#include "api/graph/fast_loader_graph.h"
-#include "api/data/index_request.h"
-#ifdef HH_USE_CUDA
-#include "api/view/unified_view.h"
-#endif //HH_USE_CUDA
+#include "../../api/graph/options/abstract_border_creator.h"
 
-#endif //FAST_LOADER_FAST_LOADER_H
+/// @brief FastLoader namespace
+namespace fl {
+/// @brief FastLoader internal namespace
+namespace internal {
+
+/// @brief Default border creator, do nothing
+/// @tparam ViewType Type of the view
+template<class ViewType>
+class DefaultBorderCreator : public AbstractBorderCreator<ViewType> {
+ public:
+  /// @brief Default constructor
+  DefaultBorderCreator() = default;
+  /// @brief Default destructor
+  ~DefaultBorderCreator() override = default;
+
+  /// @brief Do nothing
+  /// @param view Unused view
+  /// @return An empty list of request
+  std::list<std::shared_ptr<internal::TileRequest<ViewType>>>
+  tileRequestsToFillBorders([[maybe_unused]]std::shared_ptr<ViewType> const &view) override {
+    return {};
+  }
+
+  /// @brief Do nothing
+  /// @param view Unused view
+  void fillBorderWithExistingValues([[maybe_unused]]std::shared_ptr<ViewType> const &view) override {
+  }
+
+};
+
+} // fl
+} // internal
+
+#endif //FAST_LOADER_DEFAULT_BORDER_CREATOR_H

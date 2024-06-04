@@ -16,19 +16,39 @@
 // damage to property. The software developed by NIST employees is not subject to copyright protection within the
 // United States.
 
-#ifndef FAST_LOADER_FAST_LOADER_H
-#define FAST_LOADER_FAST_LOADER_H
+#ifndef FAST_LOADER_DIRECT_TO_COPY_STATE_H
+#define FAST_LOADER_DIRECT_TO_COPY_STATE_H
 
-#include "api/graph/options/abstract_border_creator.h"
-#include "api/graph/abstract_tile_loader.h"
-#include "api/graph/options/abstract_traversal.h"
-#include "api/graph/adaptive/adaptive_fast_loader_graph.h"
-#include "api/view/default_view.h"
-#include "api/graph/fast_loader_configuration.h"
-#include "api/graph/fast_loader_graph.h"
-#include "api/data/index_request.h"
-#ifdef HH_USE_CUDA
-#include "api/view/unified_view.h"
-#endif //HH_USE_CUDA
+#include <hedgehog/hedgehog.h>
+#include "../data/adaptive_tile_request.h"
 
-#endif //FAST_LOADER_FAST_LOADER_H
+/// @brief FastLoader namespace
+namespace fl {
+/// @brief FastLoader internal namespace
+namespace internal {
+
+/// @brief State used to filter the AdaptiveTileRequest that does not need copies from the tile loader
+/// @tparam Viewtype Type of the view
+template<class Viewtype>
+class DirectToCopyState :
+    public hh::AbstractState<1, fl::internal::AdaptiveTileRequest<Viewtype>, fl::internal::AdaptiveTileRequest<Viewtype>> {
+ public:
+  /// @brief Default constructor
+  DirectToCopyState() = default;
+  /// @brief Default destructor
+  virtual ~DirectToCopyState() = default;
+
+  /// @brief Execute method implementation used to filter the AdaptiveTileRequest
+  /// @param ptr AdaptiveTileRequest to filter
+  void execute(std::shared_ptr<fl::internal::AdaptiveTileRequest<Viewtype>> ptr) override {
+    if (!(ptr->needCopyFromPhysicalTileLoader())) {
+      this->addResult(ptr);
+    }
+  }
+
+};
+
+}
+}
+
+#endif //FAST_LOADER_DIRECT_TO_COPY_STATE_H
