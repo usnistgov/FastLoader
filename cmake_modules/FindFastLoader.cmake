@@ -19,8 +19,11 @@
 SET(FastLoader_FOUND ON)
 
 include(CheckCXXCompilerFlag)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if (CMAKE_CXX_STANDARD LESS 20)
+    message(FATAL_ERROR
+            "Hedgehog requires at least C++20 and the current version of C++ is set to '${CMAKE_CXX_STANDARD}'.\n"
+            "Consider setting CMAKE_CXX_STANDARD to 20 or higher.")
+endif()
 
 #Check FastLoader dependencies
 if (FastLoader_FIND_QUIETLY)

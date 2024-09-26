@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(FastLoader VERSION 4.0.0 LANGUAGES CXX)
+project(FastLoader VERSION 4.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
