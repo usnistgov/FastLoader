@@ -8,7 +8,7 @@ include(FetchContent) # Used to download GTEST
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 find_package(Hedgehog REQUIRED)
 
-option(TEST_FAST_LOADER "Downloads google unit test API and runs google test scripts to test FastLoader core and api" ON)
+option(TEST_FAST_LOADER "Downloads google unit test API and runs google test scripts to test FastLoader core and api" OFF)
 option(BUILD_MAIN "Compiles main function for testing changes to API" OFF)
 
 # Create version.h file in api folder
@@ -38,9 +38,16 @@ if (TEST_FAST_LOADER)
 
     file(GLOB_RECURSE test_fast_loader_header tests/*.h)
     add_executable(gtest_fast_loader ${test_fast_loader_header} tests/test_fast_loader.cc)
+
+    if (MSVC)
+        target_compile_options(gtest_fast_loader PRIVATE /bigobj)
+    endif (MSVC)
+
     target_link_libraries(gtest_fast_loader gtest_main)
+
     include(GoogleTest)
     gtest_discover_tests(gtest_fast_loader)
+
 endif (TEST_FAST_LOADER)
 
 if (BUILD_MAIN)
@@ -52,5 +59,40 @@ if (BUILD_MAIN)
 
     file(GLOB_RECURSE fast_loader_header fast_loader/*.h)
 
-    add_executable(FastLoader main.cpp ${fast_loader_header})
+    add_executable(FastLoaderMain main.cpp ${fast_loader_header})
 endif (BUILD_MAIN)
+
+# Add a dummy target to make the export work
+add_library(FastLoader INTERFACE)
+target_include_directories(FastLoader INTERFACE $<INSTALL_INTERFACE:include>)
+
+# Install the target
+install(TARGETS FastLoader EXPORT FastLoaderTargets)
+
+configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/FastLoaderConfig.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/FastLoaderConfig.cmake"
+        @ONLY
+)
+
+install(
+        FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/FastLoaderConfig.cmake"
+        DESTINATION
+        "${CMAKE_INSTALL_PREFIX}/share/FastLoader"
+)
+
+install(
+        EXPORT
+        FastLoaderTargets
+        NAMESPACE
+        FastLoader::
+        DESTINATION
+        "${CMAKE_INSTALL_PREFIX}/share/FastLoader"
+        FILE FastLoaderTargets.cmake
+)
+
+
+install(DIRECTORY fast_loader
+        DESTINATION include
+        COMPONENT headers)
