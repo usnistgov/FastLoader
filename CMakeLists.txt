@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 include(FetchContent) # Used to download GTEST
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
-find_package(Hedgehog REQUIRED)
 
 option(TEST_FAST_LOADER "Downloads google unit test API and runs google test scripts to test FastLoader core and api" OFF)
 option(BUILD_MAIN "Compiles main function for testing changes to API" OFF)
@@ -16,6 +15,8 @@ configure_file(inputs_cmake/version.h.in "${PROJECT_SOURCE_DIR}/fast_loader/vers
 
 # Gtest
 if (TEST_FAST_LOADER)
+    find_package(Hedgehog REQUIRED)
+
     message("Fetch Gtest")
     if (POLICY CMP0135)
         FetchContent_Declare(
@@ -51,6 +52,8 @@ if (TEST_FAST_LOADER)
 endif (TEST_FAST_LOADER)
 
 if (BUILD_MAIN)
+    find_package(Hedgehog REQUIRED)
+
     if (MSVC)
         set(CMAKE_CXX_FLAGS "-Wall")
     else (MSVC)
