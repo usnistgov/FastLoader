@@ -57,7 +57,9 @@ class CopyPhysicalToView : public hh::AbstractTask<
                                          std::shared_ptr<internal::CachedTile<typename ViewType::data_t>>>> data) override {
     auto tileRequestData = data->first;
     auto cachedTile = data->second;
-    cachedTile->unlock();
+
+    cachedTile->lock();
+    
     typename ViewType::data_t
         *const dataFrom = cachedTile->data()->data(),
         *const dataTo = tileRequestData->view()->viewOrigin();
@@ -84,7 +86,10 @@ class CopyPhysicalToView : public hh::AbstractTask<
         copyImpl(dataFrom, dataTo, dimensionFrom, dimensionTo, 0, 0, copy, dimensionFrom.size());
       }
     }
+    
     this->addResult(tileRequestData);
+
+    cachedTile->unlock(); // Unlock the tile after copying
   }
 
   /// @brief Hedgehog copy method

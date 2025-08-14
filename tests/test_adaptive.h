@@ -71,13 +71,13 @@ void testAdaptiveFL() {
             ASSERT_EQ(fl.nbTilesDims(0), afl.nbTilesDims(0));
 
             fl.executeGraph();
-            fl.createDotFile("fl.dot", hh::ColorScheme::EXECUTION, hh::StructureOptions::QUEUE, hh::InputOptions::GATHERED);
+            //fl.createDotFile("fl.dot", hh::ColorScheme::EXECUTION, hh::StructureOptions::QUEUE, hh::InputOptions::GATHERED);
             fl.requestAllViews(0);
             fl.finishRequestingViews();
 
             afl.executeGraph();
 
-            afl.createDotFile("afl.dot", hh::ColorScheme::EXECUTION, hh::StructureOptions::QUEUE, hh::InputOptions::GATHERED);
+            //afl.createDotFile("afl.dot", hh::ColorScheme::EXECUTION, hh::StructureOptions::QUEUE, hh::InputOptions::GATHERED);
             afl.requestAllViews(0);
             afl.finishRequestingViews();
 

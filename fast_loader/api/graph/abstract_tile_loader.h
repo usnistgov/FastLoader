@@ -120,6 +120,8 @@ class AbstractTileLoader
     auto index = tileRequestData->index();
     // Get the tile from the cache
     cachedTile = cache_->lockedTile(index);
+    
+    cachedTile->lock();
 
     //If new load from user interface
     if (cachedTile->newTile()) {
@@ -129,13 +131,16 @@ class AbstractTileLoader
       auto end = std::chrono::system_clock::now();
       fileLoadingTime_ += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
     }
-
+        
     this->addResult(
         std::make_shared<std::pair<std::shared_ptr<internal::TileRequest<ViewType>>,
                                    std::shared_ptr<internal::CachedTile<typename ViewType::data_t>>>>(
             tileRequestData, cachedTile
         )
     );
+
+    cachedTile->unlock(); // Unlock the tile to allow other threads to access it
+
   }
 
   /// @brief Copy the TileLoader by calling user-defined copyTileLoader method and setting the caches

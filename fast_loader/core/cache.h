@@ -179,8 +179,7 @@ class Cache {
     assert(isInCache(index));
 
     // Get the tile
-    CachedTile_t tile = mapCache_.at(mapIndex(index));
-    tile->lock();
+    CachedTile_t tile = mapCache_.at(mapIndex(index));    
 
     // Update the tile position in the LRU
     lru_.erase(mapLRU_[tile]);
@@ -195,8 +194,7 @@ class Cache {
   /// @return The new tile
   [[nodiscard]] CachedTile_t newLockedTile(std::vector<size_t> const &index) {
     // Get tile from the pool
-    CachedTile_t tile = pool_.front();
-    tile->lock();
+    CachedTile_t tile = pool_.front();    
     pool_.pop();
 
     // Set tile information except data
@@ -217,7 +215,7 @@ class Cache {
 
     // Get LRU Tile
     toRecycle = lru_.back();
-    toRecycle->lock();
+    //toRecycle->lock();
     lru_.pop_back();
 
     // Clean The Tile
@@ -231,7 +229,7 @@ class Cache {
     auto end = std::chrono::system_clock::now();
     recycleTime_ += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
-    toRecycle->unlock();
+    //toRecycle->unlock();
   }
 
 };

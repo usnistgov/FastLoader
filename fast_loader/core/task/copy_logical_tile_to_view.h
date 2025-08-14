@@ -51,6 +51,8 @@ class CopyLogicalTileToView :
     std::shared_ptr<fl::internal::TileRequest<ViewType>> logicalTileRequest = adaptiveTileRequest->logicalTileRequest();
     std::shared_ptr<fl::internal::CachedTile<typename ViewType::data_t>> logicalCachedTile =
         adaptiveTileRequest->logicalCachedTile();
+    
+    logicalCachedTile->lock(); // Lock the tile to prevent concurrent access
 
     size_t const
         fullDimFrom = std::accumulate(logicalCachedTile->dimension().cbegin(),
@@ -75,10 +77,11 @@ class CopyLogicalTileToView :
                  logicalCachedTile->dimension(), logicalTileRequest->view()->viewDims(),
                  0, 0, copy, logicalCachedTile->dimension().size());
       }
-    }
-
-    logicalCachedTile->unlock();
+    }    
+    
     this->addResult(logicalTileRequest);
+
+    logicalCachedTile->unlock(); // Unlock the tile after copying
   }
 
   /// @brief Copy method to duplicate the Hedgehog tasks

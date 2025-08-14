@@ -107,8 +107,10 @@ class MapperLogicalPhysical : public hh::AbstractTask<1, TileRequest<ViewType>, 
     auto const &requestedIndex = tileRequest->index();
 
     std::shared_ptr<CachedTile<DataType>> logicalCachedTile = cache_->lockedTile(requestedIndex);
+    logicalCachedTile->lock();
     if (!logicalCachedTile->newTile()) {
       ++nbElementDirectToCopy_;
+      logicalCachedTile->unlock();
       this->addResult(std::make_shared<fl::internal::AdaptiveTileRequest<ViewType>>(tileRequest, logicalCachedTile));
     } else {
       //Need to create N AdaptiveTileRequest to fill the logical Cache Tile from tile loader
@@ -187,12 +189,13 @@ class MapperLogicalPhysical : public hh::AbstractTask<1, TileRequest<ViewType>, 
       );
 
       size_t const nbOfAdaptiveTileRequests = adaptiveTileRequests.size();
-
+      
       for (auto &tr : adaptiveTileRequests) {
         ++nbElementsToTL_;
         tr->nbPhysicalTileRequests(nbOfAdaptiveTileRequests);
         this->addResult(tr);
       }
+      logicalCachedTile->unlock();
     }
   }
 
