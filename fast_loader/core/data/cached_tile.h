@@ -26,6 +26,7 @@
 #include <sstream>
 #include <iterator>
 #include <ostream>
+#include <semaphore>
 
 /// @brief FastLoader namespace
 namespace fl {
@@ -43,6 +44,7 @@ class CachedTile {
   std::vector<size_t> const dimension_{}; ///< Tile dimensions
   bool newTile_{}; ///< Flax for new tile
   std::mutex accessMutex_{}; ///< Mutex for accessing the tile
+  std::binary_semaphore semaphore_{1}; ///< Semaphore for cache safety
 
  public:
   /// @brief Cached tile constructor
@@ -89,6 +91,14 @@ class CachedTile {
 
   /// @brief Unlock inner mutex
   void unlock() { accessMutex_.unlock(); }
+
+  void acquireSemaphore() {
+    semaphore_.acquire();
+  }
+
+  void releaseSemaphore() {
+    semaphore_.release();
+  } 
 
   /// @brief Output stream operator for the cached tile
   /// @param os Output stream

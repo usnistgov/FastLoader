@@ -80,7 +80,7 @@ class CopyLogicalTileToView :
     }    
     
     this->addResult(logicalTileRequest);
-
+    logicalCachedTile->releaseSemaphore(); // Release the semaphore to allow other tasks to access the tile
     logicalCachedTile->unlock(); // Unlock the tile after copying
   }
 

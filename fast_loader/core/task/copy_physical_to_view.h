@@ -88,7 +88,7 @@ class CopyPhysicalToView : public hh::AbstractTask<
     }
     
     this->addResult(tileRequestData);
-
+    cachedTile->releaseSemaphore(); // Release the semaphore to allow other tasks to access the tile
     cachedTile->unlock(); // Unlock the tile after copying
   }
 
