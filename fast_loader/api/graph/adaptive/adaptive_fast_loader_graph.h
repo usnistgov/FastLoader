@@ -171,7 +171,7 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
       using ViewDataType = internal::DefaultViewData<DataType>;
 
       auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
-          this->configuration_->ordered_, 0, this->configuration_->fillingType_,
+          this->configuration_->ordered_, this->configuration_->fillingType_,
           viewCounter,
           this->fullDimensionPerLevel_, this->tileDimensionPerLevel_, this->radii(), this->tileLoader_->dimNames()
       );
@@ -233,7 +233,7 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
       using ViewDataType = internal::UnifiedViewData<typename ViewType::data_t>;
 
       auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
-          this->configuration_->ordered_, 0, this->configuration_->fillingType_,
+          this->configuration_->ordered_, this->configuration_->fillingType_,
           viewCounter,
           this->fullDimensionPerLevel_, this->tileDimensionPerLevel_, this->radii(), this->tileLoader_->dimNames()
       );

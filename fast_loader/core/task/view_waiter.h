@@ -36,7 +36,7 @@ template<class ViewType, class ViewDataType>
 class ViewWaiter : public hh::AbstractTask<1, IndexRequest, ViewDataType> {
  private:
   bool const ordered_; ///< Ordering flag
-  size_t const level_; ///< Pyramidal level
+  size_t level_; ///< Pyramidal level
   FillingType const fillingType_; ///< Filling used to fill the view
   std::shared_ptr<ViewCounter<ViewType>> const viewCounter_; ///< FastLoader's ViewCounter
 
@@ -44,7 +44,7 @@ class ViewWaiter : public hh::AbstractTask<1, IndexRequest, ViewDataType> {
       fullDimensionPerLevel_{}, ///< Full / file dimensions per level
       tileDimensionPerLevel_{}; ///< Tile dimensions per level
 
-  std::vector<size_t> const &
+  std::vector<size_t>
       fullDimension_{}, ///< Full dimension for this level
       tileDimension_{}; ///< Tile dimension for this level
 
@@ -64,26 +64,33 @@ class ViewWaiter : public hh::AbstractTask<1, IndexRequest, ViewDataType> {
   /// @param radii View radii
   /// @param dimensionNames Dimension names
   ViewWaiter(
-      bool const ordered, size_t const level, FillingType const fillingType,
+      bool const ordered, FillingType const fillingType,
       std::shared_ptr<ViewCounter<ViewType>> const viewCounter,
       std::shared_ptr<std::vector<std::vector<size_t>>> const &fullDimensionPerLevel,
       std::shared_ptr<std::vector<std::vector<size_t>>> const &tileDimensionPerLevel,
       std::vector<size_t> const &radii, std::vector<std::string> const& dimensionNames)
       : hh::AbstractTask<1, IndexRequest, ViewDataType>("View Waiter"),
-        ordered_(ordered), level_(level), fillingType_(fillingType), viewCounter_(viewCounter),
-        fullDimensionPerLevel_(fullDimensionPerLevel), tileDimensionPerLevel_(tileDimensionPerLevel),
-        fullDimension_(fullDimensionPerLevel_->at(level_)), tileDimension_(tileDimensionPerLevel_->at(level_)),
-        radii_(radii), dimensionNames_(dimensionNames) {
-    std::transform(
+        ordered_(ordered), level_(0), fillingType_(fillingType), viewCounter_(viewCounter),
+        fullDimensionPerLevel_(fullDimensionPerLevel), tileDimensionPerLevel_(tileDimensionPerLevel),        
+        radii_(radii), dimensionNames_(dimensionNames) {   
+  }
+
+  /// @brief Default destructor
+  ~ViewWaiter() override = default;
+
+  /// @brief Initialize the task, set the pyramidal level from the graph id, each graph operates with a separate pyramid level
+  void initialize() override {
+    this->level_ = static_cast<size_t>(this->graphId());
+    fullDimension_ = fullDimensionPerLevel_->at(level_); 
+    tileDimension_ = tileDimensionPerLevel_->at(level_);
+
+     std::transform(
         fullDimensionPerLevel_->at(level_).cbegin(), fullDimensionPerLevel_->at(level_).cend(),
         tileDimensionPerLevel_->at(level_).cbegin(), std::back_insert_iterator<std::vector<size_t>>(nbTilesPerDimension_),
         [](auto const &fullDimension, auto const &tileDimension) {
           return (size_t) std::ceil((double) fullDimension / (double) tileDimension);
         });
   }
-
-  /// @brief Default destructor
-  ~ViewWaiter() override = default;
 
   /// @brief From an indexRequest, get an available view from a memory manager and attach the request
   /// @param indexRequest Index request for getting a view
@@ -117,7 +124,7 @@ class ViewWaiter : public hh::AbstractTask<1, IndexRequest, ViewDataType> {
   /// @brief Copy method for duplicating this Hedgehog task
   /// @return New instance of this task
   std::shared_ptr<hh::AbstractTask<1, IndexRequest, ViewDataType>> copy() override {
-    return std::make_shared<ViewWaiter>(ordered_, level_ + 1, fillingType_, viewCounter_, fullDimensionPerLevel_,
+    return std::make_shared<ViewWaiter>(ordered_, fillingType_, viewCounter_, fullDimensionPerLevel_,
                                         tileDimensionPerLevel_, radii_, dimensionNames_);
   }
 };

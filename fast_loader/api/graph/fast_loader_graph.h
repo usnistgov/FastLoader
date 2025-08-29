@@ -189,7 +189,7 @@ class FastLoaderGraph : public hh::Graph<1, IndexRequest, ViewType> {
       auto viewLoader =
           std::make_shared<internal::ViewLoader<ViewType, ViewDataType>>(configuration_->borderCreator_);
       auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
-          configuration_->ordered_, 0, configuration_->fillingType_, viewCounter,
+          configuration_->ordered_, configuration_->fillingType_, viewCounter,
           fullDimensionPerLevel_, tileDimensionPerLevel_, configuration_->radii_, tileLoader_->dimNames()
       );
       auto mm = std::make_shared<internal::FastLoaderMemoryManager<ViewDataType>>(
@@ -205,7 +205,7 @@ class FastLoaderGraph : public hh::Graph<1, IndexRequest, ViewType> {
       auto viewLoader =
           std::make_shared<internal::ViewLoader<ViewType, ViewDataType>>(configuration_->borderCreator_);
       auto viewWaiter = std::make_shared<internal::ViewWaiter<ViewType, ViewDataType>>(
-          configuration_->ordered_, 0, configuration_->fillingType_, viewCounter,
+          configuration_->ordered_, configuration_->fillingType_, viewCounter,
           fullDimensionPerLevel_, tileDimensionPerLevel_, configuration_->radii_, tileLoader_->dimNames());
       auto mm = std::make_shared<internal::FastLoaderMemoryManager<ViewDataType>>(
           this->configuration_->viewAvailablePerLevel_, sizeMemoryManagerPerLevel, configuration_->nbReleasePyramid_);
