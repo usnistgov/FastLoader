@@ -53,7 +53,7 @@ auto createAdaptiveFL(size_t const nbDimensions,
 }
 
 
-void testAdaptiveFL() {
+void testAdaptiveFL() {  
   std::vector<size_t> const
       nbDimensions{1, 2, 3},
       fullSize{2, 5, 9},

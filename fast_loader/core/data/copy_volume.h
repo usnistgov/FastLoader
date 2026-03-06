@@ -23,6 +23,7 @@
 #include <vector>
 #include <tuple>
 #include <ostream>
+#include <sstream>
 #include <iterator>
 
 /// @brief FastLoader namespace
@@ -93,6 +94,48 @@ class CopyVolume {
   /// @param rhs CopyVolume to compare against
   /// @return True is the CopyVolume are different, else false
   bool operator!=(CopyVolume const &rhs) const { return !(rhs == *this); }
+
+  /// @brief Output stream operator
+  /// @param os Output stream
+  /// @param volume Volume to print
+  /// @return Stream with the volume
+  /// @brief Check if the copy is within the bounds of the source and destination buffers
+  /// @param srcDims Dimensions of the source buffer
+  /// @param dstDims Dimensions of the destination buffer
+  /// @return True if the copy is within bounds, else false
+  [[nodiscard]] bool isWithinBounds(std::vector<size_t> const &srcDims, std::vector<size_t> const &dstDims) const {
+    for (size_t d = 0; d < dimension_.size(); ++d) {
+      if (positionFrom_.at(d) + dimension_.at(d) > srcDims.at(d)) return false;
+      if (positionTo_.at(d) + dimension_.at(d) > dstDims.at(d)) return false;
+    }
+    return true;
+  }
+
+  /// @brief Generate a human-readable report of which dimensions are out of bounds
+  /// @param srcDims Dimensions of the source buffer
+  /// @param dstDims Dimensions of the destination buffer
+  /// @return String describing which dimensions are out of bounds
+  [[nodiscard]] std::string boundsReport(std::vector<size_t> const &srcDims, std::vector<size_t> const &dstDims) const {
+    std::ostringstream oss;
+    for (size_t d = 0; d < dimension_.size(); ++d) {
+      size_t srcEnd = positionFrom_.at(d) + dimension_.at(d);
+      size_t dstEnd = positionTo_.at(d) + dimension_.at(d);
+      if (srcEnd > srcDims.at(d) || dstEnd > dstDims.at(d)) {
+        oss << "Dimension " << d << ": "
+            << "Source: positionFrom=" << positionFrom_.at(d)
+            << " + copySize=" << dimension_.at(d)
+            << " = " << srcEnd
+            << (srcEnd > srcDims.at(d) ? " exceeds" : " within")
+            << " source dimension " << srcDims.at(d) << ". "
+            << "Destination: positionTo=" << positionTo_.at(d)
+            << " + copySize=" << dimension_.at(d)
+            << " = " << dstEnd
+            << (dstEnd > dstDims.at(d) ? " exceeds" : " within")
+            << " dest dimension " << dstDims.at(d) << ". ";
+      }
+    }
+    return oss.str();
+  }
 
   /// @brief Output stream operator
   /// @param os Output stream

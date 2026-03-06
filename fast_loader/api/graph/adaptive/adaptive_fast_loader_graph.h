@@ -20,6 +20,7 @@
 #define FAST_LOADER_ADAPTIVE_FAST_LOADER_GRAPH_H
 
 #include <utility>
+#include <iostream>
 
 #include "../fast_loader_graph.h"
 #include "../../../core/task/mapper_logical_physical.h"
@@ -366,6 +367,27 @@ class AdaptiveFastLoaderGraph : public fl::FastLoaderGraph<ViewType> {
     if (std::any_of(logicalTileCacheMBPerLevel_->cbegin(), logicalTileCacheMBPerLevel_->cend(),
                     [](size_t const &val) { return val == 0; })) {
       throw std::runtime_error("The logical tile cache requested should be superior to 0 MB.");
+    }
+
+    for (size_t level = 0; level < this->nbPyramidLevels_; ++level) {
+      auto const &logicalTileDims = logicalTileDimensionRequestedPerDimensionPerLevel.at(level);
+      if (logicalTileDims.size() != this->nbDimensions_) {
+        std::ostringstream oss;
+        oss << "Logical tile dimensions at level " << level
+            << " has " << logicalTileDims.size()
+            << " dimensions, expected " << this->nbDimensions_ << ".";
+        throw std::runtime_error(oss.str());
+      }
+
+      auto const fullDims = this->tileLoader_->fullDims(level);
+      for (size_t d = 0; d < this->nbDimensions_; ++d) {
+        if (logicalTileDims.at(d) > fullDims.at(d)) {
+          std::cerr << "Warning: Logical tile dimension " << logicalTileDims.at(d)
+                    << " exceeds full image dimension " << fullDims.at(d)
+                    << " in dimension " << d << " at level " << level
+                    << ". The tile will be clamped to the image bounds." << std::endl;
+        }
+      }
     }
   }
 };

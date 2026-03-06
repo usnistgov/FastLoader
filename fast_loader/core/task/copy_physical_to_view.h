@@ -20,6 +20,7 @@
 #define FAST_LOADER_COPY_PHYSICAL_TO_VIEW_H
 
 #include <hedgehog/hedgehog.h>
+#include <cassert>
 #include "../data/tile_request.h"
 #include "../data/cached_tile.h"
 
@@ -75,6 +76,14 @@ class CopyPhysicalToView : public hh::AbstractTask<
     1, std::multiplies<>());
 
     for (internal::CopyVolume const &copy : tileRequestData->copies()) {
+      if (!copy.isWithinBounds(dimensionFrom, dimensionTo)) {
+        cachedTile->releaseSemaphore();
+        cachedTile->unlock();
+        throw std::runtime_error(
+            "CopyPhysicalToView: out-of-bounds copy detected. " + copy.boundsReport(dimensionFrom, dimensionTo)
+            + "This typically means the tile dimensions do not evenly divide the image — "
+              "consider using AdaptiveFastLoaderGraph with explicit logical tile dimensions.");
+      }
       if (fullDimFrom == fullDimTo &&
           fullDimFrom
               == std::accumulate(copy.dimension().cbegin(), copy.dimension().cend(), (size_t)
@@ -122,6 +131,12 @@ class CopyPhysicalToView : public hh::AbstractTask<
       size_t const nbDimension, size_t const dimension = 0) const {
 
     if (dimension == nbDimension - 1) {
+      assert(
+          deltaFrom + copy.positionFrom().at(dimension) + copy.dimension().at(dimension)
+          <= std::accumulate(dimensionFrom.cbegin(), dimensionFrom.cend(), (size_t)1, std::multiplies<>()));
+      assert(
+          deltaTo + copy.positionTo().at(dimension) + copy.dimension().at(dimension)
+          <= std::accumulate(dimensionTo.cbegin(), dimensionTo.cend(), (size_t)1, std::multiplies<>()));
       // If copy is reversed for the most inner dimension use revers_copy instead of copy
       if (copy.reverseCopies().at(dimension)) {
         std::reverse_copy(
