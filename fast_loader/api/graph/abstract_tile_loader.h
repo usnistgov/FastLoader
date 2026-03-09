@@ -162,6 +162,8 @@ class AbstractTileLoader
   /// @brief Information printed for the tile loader including miss rate and access time
   /// @return String containing Tile loader information
   [[nodiscard]]std::string extraPrintingInformation() const override {
+    if (!cache_) { return ""; }
+    
     std::ostringstream oss;
     oss << "Miss rate: "
         << std::setprecision(3)
