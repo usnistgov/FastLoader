@@ -202,6 +202,7 @@ class MapperLogicalPhysical : public hh::AbstractTask<1, TileRequest<ViewType>, 
   /// @brief Extra printing information implementation from Hedgehog library
   /// @return string containing extra printing information concerning cache properties
   [[nodiscard]] std::string extraPrintingInformation() const override {
+    if (!cache_) { return ""; }
     std::ostringstream oss;
     oss << "Miss rate: "
         << std::setprecision(3)
