@@ -61,7 +61,7 @@ class FastLoaderMemoryManager
 /// @return Copy of the current AbstractMemoryManager
   std::shared_ptr<hh::AbstractMemoryManager> copy() override {
     return std::make_shared<FastLoaderMemoryManager<ViewDataType>>(
-        viewAvailablePerLevel_, viewSizePerLevel_, releasePerLevel_, level_++);
+        viewAvailablePerLevel_, viewSizePerLevel_, releasePerLevel_, ++level_);
   }
 };
 
